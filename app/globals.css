@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* Palette taken from docs/mockup.png */
+@theme inline {
+  --color-teal: #12707a;
+  --color-teal-dark: #0c565e;
+  --color-teal-soft: #e2f0f1;
+  --color-ink: #16272b;
+  --color-muted: #55666a;
+  --color-line: #dbe5e7;
+  --color-page: #f2f6f7;
+  --color-amber: #b45f06;
+  --color-amber-soft: #fdf3e3;
+  --color-whatsapp: #1f9150;
+  --font-sans: var(--font-inter);
+}
+
+html {
+  /* Large base size: the primary user is 55 and reads on her phone */
+  font-size: 112.5%;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
