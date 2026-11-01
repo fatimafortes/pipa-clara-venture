@@ -1,6 +1,5 @@
 "use server";
 
-import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
@@ -36,23 +35,36 @@ export async function createCistern(
   const labels = formData.getAll("labels").map(String);
 
   const result = validateCistern({ ...values, labels });
-  if (!result.ok) return { errors: result.errors, values, labels };
-
-  const cistern = result.value;
-  const { error } = await supabase.from(TABLES.cisterns).insert({
-    name: cistern.name,
-    length_m: cistern.lengthM,
-    width_m: cistern.widthM,
-    max_height_cm: cistern.maxHeightCm,
-    households_count: cistern.householdsCount,
-    household_labels: cistern.labels,
-  });
-
-  if (error) {
-    console.error("[createCistern]", error.code, error.message);
-    return { errors: { form: "No se pudo guardar. Revisa tu conexión e intenta otra vez." }, values, labels };
+  if (!result.ok) {
+    console.warn("[createCistern] validation failed:", Object.keys(result.errors).join(", "));
+    return { errors: result.errors, values, labels };
   }
 
-  refresh();
-  return { errors: {}, values: {}, labels: [] };
+  const cistern = result.value;
+  // .select().single() makes Supabase return the saved row, so "no error" can't hide "nothing saved"
+  const { data, error } = await supabase
+    .from(TABLES.cisterns)
+    .insert({
+      name: cistern.name,
+      length_m: cistern.lengthM,
+      width_m: cistern.widthM,
+      max_height_cm: cistern.maxHeightCm,
+      households_count: cistern.householdsCount,
+      household_labels: cistern.labels,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    console.error("[createCistern] insert failed:", error?.code, error?.message, error?.details, error?.hint);
+    return {
+      errors: { form: `No se pudo guardar la cisterna. Intenta otra vez. (código: ${error?.code ?? "sin fila"})` },
+      values,
+      labels,
+    };
+  }
+
+  console.info("[createCistern] saved", data.id);
+  // A full redirect re-reads /app from the database instead of trusting any cached page
+  redirect("/app");
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Checkbox, Field, FormError } from "@/components/Field";
+import { Checkbox, Field, FormError, SubmitErrors } from "@/components/Field";
 import { createDelivery, type DeliveryFormState } from "../actions";
 import { PhotoField } from "./PhotoField";
 
@@ -96,6 +96,7 @@ export function DeliveryForm({ userId, maxHeightCm }: { userId: string; maxHeigh
         />
       </section>
 
+      {!pending && <SubmitErrors errors={state.errors} />}
       <button
         type="submit"
         disabled={pending || uploads > 0}

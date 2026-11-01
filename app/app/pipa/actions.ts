@@ -45,7 +45,10 @@ export async function createDelivery(
     { ...values, pumpRan: values.pumpRan === "on", overflowed: values.overflowed === "on" },
     Number(cistern.max_height_cm),
   );
-  if (!result.ok) return { errors: result.errors, values };
+  if (!result.ok) {
+    console.warn("[createDelivery] validation failed:", Object.keys(result.errors).join(", "));
+    return { errors: result.errors, values };
+  }
   const input = result.value;
 
   // Only accept photo paths inside her own folder
@@ -84,10 +87,10 @@ export async function createDelivery(
     .select("id")
     .single();
 
-  const failed = (where: string, error: { code?: string; message: string }) => {
-    console.error(`[createDelivery] ${where}`, error.code, error.message);
+  const failed = (where: string, error: { code?: string; message: string; details?: string | null }) => {
+    console.error(`[createDelivery] ${where} failed:`, error.code, error.message, error.details);
     return {
-      errors: { form: "No se pudo guardar la pipa. Revisa tu conexión e intenta otra vez." },
+      errors: { form: `No se pudo guardar la pipa. Intenta otra vez. (código: ${error.code ?? "?"})` },
       values,
     };
   };
@@ -134,5 +137,6 @@ export async function createDelivery(
     return failed("readings/shares", childError);
   }
 
+  console.info("[createDelivery] saved", delivery.id, verdict.verdict);
   redirect(`/app/pipa/${delivery.id}`);
 }

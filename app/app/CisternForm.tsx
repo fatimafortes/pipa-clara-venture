@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormError } from "@/components/Field";
+import { Field, FormError, SubmitErrors } from "@/components/Field";
 import { createCistern, type CisternFormState } from "./actions";
 
 const initialState: CisternFormState = { errors: {}, values: {}, labels: [] };
@@ -94,6 +94,7 @@ export function CisternForm() {
         </fieldset>
       )}
 
+      {!pending && <SubmitErrors errors={state.errors} />}
       <button
         type="submit"
         disabled={pending}

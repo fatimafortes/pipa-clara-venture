@@ -144,3 +144,17 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Minimal list of deliveries on `/app`** (date + verdict, newest first), because the F6 acceptance needs her to "find it again after signing out and back in". The fuller history is F7.
 - **Known risk for the persona test:** the form lives in one page for the ~40 min the truck takes. Photos are safe as soon as they upload, but if the phone reloads the page, the typed numbers are lost. Watch for it in Rosa's walkthrough.
 - **Tested by me:** unit tests, lint, types, build, and that the new pages redirect to `/login` without a session. **The full flow with photos must be tested by the founder on her phone.**
+
+### F5 — Bug: the cistern "saved" but nothing was stored (in progress)
+
+- **Reported by the founder (production, phone):** pressed "Guardar cisterna", saw no error, reloaded `/app` and got the empty form again; `pc_cisterns` was empty in Supabase.
+- **What the evidence shows so far:**
+  - Vercel logs: 6 `POST /app` (the save action) between 15:32 and 15:34, all HTTP 200, no error lines. Only 2 of them invoked the server function (`λ`); one was served with **`cache=HIT`**, so that save never reached our code.
+  - The Supabase API does see the table: an anonymous read-only probe got `401 / 42501 permission denied for table pc_cisterns`, exactly as designed (rules out a missing table or schema-cache problem).
+  - The local dev log has no save attempts (she only tested in production).
+- **Three real defects found, fixed now:**
+  1. **Errors were invisible on a phone.** "No se pudo guardar" rendered at the *top* of the form, off-screen while her thumb is on the button at the bottom, so a failed save looked like nothing happened. Fix: `SubmitErrors` shows the error (or "Revisa los N datos marcados arriba") right above the button, in both forms.
+  2. **Success was assumed, not verified.** "No error from the insert" was treated as "saved". Fix: `.insert(...).select("id").single()`, so Supabase must return the saved row; no row → visible error with its code.
+  3. **The server logged almost nothing**, so the logs can't say what happened. Fix: log validation failures (which fields), insert failures (code, message, details, hint) and successes (row id), in both actions.
+- **Also changed:** after saving the cistern, `redirect("/app")` instead of `refresh()`, so the page is re-read from the database instead of trusting any cached response.
+- **Next step:** reproduce on `localhost:3000` (no Vercel cache in between, server log visible) to find the root cause, then confirm in production.

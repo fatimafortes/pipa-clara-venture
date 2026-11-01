@@ -38,6 +38,18 @@ export function Checkbox({ label, ...input }: { label: string } & InputHTMLAttri
   );
 }
 
+// Shown right above the submit button: on a phone, a message at the top of a long
+// form is off-screen, and a failed save looks like nothing happened
+export function SubmitErrors({ errors }: { errors: Record<string, string> }) {
+  const count = Object.keys(errors).length;
+  if (count === 0) return null;
+  return (
+    <p role="alert" className="rounded-xl border-2 border-amber bg-amber-soft p-4 text-lg font-medium text-amber">
+      {errors.form ?? (count === 1 ? "Revisa el dato marcado arriba." : `Revisa los ${count} datos marcados arriba.`)}
+    </p>
+  );
+}
+
 export function FormError({ message }: { message?: string }) {
   if (!message) return null;
   return (
