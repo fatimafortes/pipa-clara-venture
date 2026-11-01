@@ -83,7 +83,12 @@ async function DeliveryVerdict({ id }: { id: string }) {
         </div>
         <div className="flex items-baseline justify-between gap-4 py-4">
           <dt className="text-lg text-muted">Litros que entraron (medidos)</dt>
-          <dd className="text-2xl font-bold">{measured === null ? "—" : formatLiters(measured)}</dd>
+          {measured === null ? (
+            // Said in words, so an empty value never looks like a broken screen
+            <dd className="text-right text-lg font-semibold text-muted">— (no se pudo medir)</dd>
+          ) : (
+            <dd className="text-2xl font-bold">{formatLiters(measured)}</dd>
+          )}
         </div>
       </dl>
 

@@ -162,3 +162,10 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   - Production (commit `805ab3d`), with her second Google account: saved, still there after reload. Vercel log: `POST /app 200 … BYPASS | [createCistern] saved f6ab5eab-…`.
 - **Root cause, honestly:** not proven. The old code (`refresh()` after an insert that was never verified) ran only in production, behind Vercel's cache, and one of her saves was answered from that cache (`cache=HIT`) without running the action. The most likely cause is that cached answer combined with the old "no error = saved" logic; both are gone now. Every save is now verified and logged, so if it ever happens again, the log will say exactly why.
 - **Lesson:** a save that can fail must say so where the user is looking, and "no error" is not proof of "saved": ask the database for the saved row.
+
+### F6 — Founder's phone test
+
+- **Faltante:** 10,000 L claimed, 26 → 142 cm on 3 × 2.5 m → "Faltante: 1,300 L" (±300 L). ✔ Log: `[createDelivery] saved 7e0ec02d-… short`.
+- **No se pudo medir** (pump ran): correct verdict, no shortfall shown. ✔ Log: `saved 603e1dec-… couldnt_measure`.
+- **Bug (founder):** in "Litros que entraron (medidos)" the founder saw nothing where the measured value should be, which looked like a broken screen. Fix: say it in words, **"— (no se pudo medir)"**, in smaller grey text so it doesn't read as a missing number.
+- **Validation:** the log shows a rejected save on `beforeCm` (the −5 test). No rejection for letters in liters was logged; on a phone the `inputMode="numeric"` keyboard may not offer letters at all. The server check is still covered by unit tests.
