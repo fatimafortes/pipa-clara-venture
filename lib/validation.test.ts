@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   parseNumber,
+  validateChallenge,
   validateCistern,
   validateDelivery,
   validatePhoto,
@@ -103,6 +104,20 @@ describe("validateDelivery (PACKET §13 form cases)", () => {
     const result = validateDelivery({ ...delivery, afterCm: "" }, 200);
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value.afterCm).toBeNull();
+  });
+});
+
+describe("validateChallenge", () => {
+  it("accepts the driver, a neighbor or the organizer, with a note", () => {
+    for (const raisedBy of ["driver", "neighbor", "organizer"]) {
+      expect(validateChallenge({ raisedBy, note: "Dice que la cinta estaba chueca" }).ok).toBe(true);
+    }
+  });
+
+  it("rejects an unknown person, an empty note and a note over 500 characters", () => {
+    expect(validateChallenge({ raisedBy: "company", note: "x" }).ok).toBe(false);
+    expect(validateChallenge({ raisedBy: "driver", note: "   " }).ok).toBe(false);
+    expect(validateChallenge({ raisedBy: "driver", note: "x".repeat(501) }).ok).toBe(false);
   });
 });
 

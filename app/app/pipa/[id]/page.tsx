@@ -4,22 +4,27 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getDelivery, type DeliveryDetail } from "@/lib/data";
 import { formatDay, formatLiters, formatMxn, formatTime } from "@/lib/format";
+import { buildSummary, whatsappLink } from "@/lib/summary";
 import { computeVerdict } from "@/lib/verdict";
+import { setSharePaid } from "../actions";
+import { ChallengeForm } from "./ChallengeForm";
 
 export const metadata: Metadata = {
   title: "Veredicto",
 };
 
-export default function DeliveryPage({ params }: PageProps<"/app/pipa/[id]">) {
+export default function DeliveryPage({ params, searchParams }: PageProps<"/app/pipa/[id]">) {
   return (
-    // Both the id and the session are request-time data (Next 16 cacheComponents)
+    // The id, the ?error flag and the session are request-time data (Next 16 cacheComponents)
     <Suspense fallback={<p className="text-lg text-muted">Cargando…</p>}>
-      {params.then(({ id }) => (
-        <DeliveryVerdict id={id} />
+      {Promise.all([params, searchParams]).then(([{ id }, query]) => (
+        <DeliveryVerdict id={id} paymentError={query.error === "pago"} />
       ))}
     </Suspense>
   );
 }
+
+const raisedByLabel = { driver: "El pipero", neighbor: "Un vecino", organizer: "Yo" } as const;
 
 const cardStyle = {
   consistent: { box: "border-teal bg-white", text: "text-teal" },
@@ -27,10 +32,10 @@ const cardStyle = {
   couldnt_measure: { box: "border-line bg-page", text: "text-ink" },
 } as const;
 
-async function DeliveryVerdict({ id }: { id: string }) {
+async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError: boolean }) {
   const detail = await getDelivery(id);
   if (!detail) notFound();
-  const { delivery, cistern, readings, shares } = detail;
+  const { delivery, cistern, readings, shares, challenges } = detail;
 
   const before = readings.find((r) => r.kind === "before");
   const after = readings.find((r) => r.kind === "after");
@@ -61,6 +66,22 @@ async function DeliveryVerdict({ id }: { id: string }) {
   const high = Math.max(...amounts);
   const paid = shares.filter((s) => s.paid).length;
   const fee = delivery.fee_mxn * shares.length;
+
+  // Built from counts and numbers only: no household labels, no challenge notes
+  const summary = buildSummary({
+    deliveredAt: delivery.delivered_at,
+    litersClaimed: delivery.liters_claimed,
+    measuredLiters: measured,
+    verdict: delivery.verdict,
+    toleranceLiters: explained.toleranceLiters,
+    beforeTakenAt: before?.taken_at ?? null,
+    driverPresent: before?.driver_present ?? false,
+    priceMxn: delivery.price_mxn,
+    feeMxn: delivery.fee_mxn,
+    shareAmounts: amounts,
+    paidCount: paid,
+    challengesCount: challenges.length,
+  });
 
   return (
     <div className="space-y-5">
@@ -122,6 +143,73 @@ async function DeliveryVerdict({ id }: { id: string }) {
           Pipa {formatMxn(delivery.price_mxn)} + cuota de Pipa Clara {formatMxn(fee)} ({shares.length} ×{" "}
           {formatMxn(delivery.fee_mxn)}) = {formatMxn(delivery.price_mxn + fee)}, en partes iguales.
         </p>
+      </section>
+
+      <a
+        href={whatsappLink(summary)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full rounded-xl bg-whatsapp px-6 py-4 text-center text-lg font-semibold text-white"
+      >
+        Mandar resumen por WhatsApp
+      </a>
+      <ChallengeForm key={challenges.length} deliveryId={delivery.id} />
+      <p className="text-center text-base text-muted">
+        El veredicto es evidencia, no sentencia. Cualquier desacuerdo queda guardado junto a él.
+      </p>
+
+      {challenges.length > 0 && (
+        <section id="desacuerdos" className="space-y-3">
+          <h2 className="text-xl font-bold">Desacuerdos</h2>
+          <ul className="space-y-3">
+            {challenges.map((c) => (
+              <li key={c.id} className="rounded-xl border-l-4 border-amber bg-white p-4">
+                <p className="text-base font-semibold text-muted">
+                  {raisedByLabel[c.raised_by]} · {formatDay(c.created_at)}, {formatTime(c.created_at)}
+                </p>
+                <p className="whitespace-pre-wrap text-lg">{c.note}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section id="pagos" className="space-y-3">
+        <div>
+          <h2 className="text-xl font-bold">Pagos</h2>
+          <p className="text-base text-muted">
+            Solo tú ves quién ya pagó. Los vecinos solo ven &quot;Ya pagaron: {paid} de {shares.length}&quot;.
+          </p>
+        </div>
+        {paymentError && (
+          <p role="alert" className="rounded-xl border-2 border-amber bg-amber-soft p-4 text-lg text-amber">
+            No se pudo guardar el pago. Intenta otra vez.
+          </p>
+        )}
+        <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+          {shares.map((s) => (
+            <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
+              <span className="text-lg">
+                <span className="font-semibold">{s.household_label}</span>
+                <span className="block text-base text-muted">{formatMxn(s.amount_mxn)}</span>
+              </span>
+              <form action={setSharePaid}>
+                <input type="hidden" name="deliveryId" value={delivery.id} />
+                <input type="hidden" name="shareId" value={s.id} />
+                <input type="hidden" name="paid" value={s.paid ? "false" : "true"} />
+                <button
+                  type="submit"
+                  aria-label={`${s.household_label}: ${s.paid ? "pagado, tocar para marcar pendiente" : "pendiente, tocar para marcar pagado"}`}
+                  className={`min-w-32 rounded-full px-4 py-2 text-lg font-semibold ${
+                    s.paid ? "bg-teal text-white" : "border-2 border-amber bg-white text-amber"
+                  }`}
+                >
+                  {s.paid ? "Pagado ✓" : "Pendiente"}
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

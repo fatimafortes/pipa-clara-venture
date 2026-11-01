@@ -45,6 +45,13 @@ export type ShareRow = {
   paid: boolean;
 };
 
+export type ChallengeRow = {
+  id: string;
+  raised_by: "driver" | "neighbor" | "organizer";
+  note: string;
+  created_at: string;
+};
+
 // Validates the session with Supabase; sends visitors without one to /login
 export async function requireUser() {
   const supabase = await createClient();
@@ -67,14 +74,20 @@ export async function getCistern(): Promise<CisternRow | null> {
   return data;
 }
 
-export async function getDeliveries(): Promise<DeliveryRow[]> {
+export async function getDeliveries(): Promise<(DeliveryRow & { paidCount: number; sharesCount: number })[]> {
   const { supabase } = await requireUser();
   const { data, error } = await supabase
     .from(TABLES.deliveries)
-    .select("id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict")
+    .select(
+      `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, ${TABLES.shares}(paid)`,
+    )
     .order("delivered_at", { ascending: false });
   if (error) throw error;
-  return data;
+  return data.map(({ [TABLES.shares]: shares, ...delivery }) => ({
+    ...(delivery as DeliveryRow),
+    paidCount: (shares as { paid: boolean }[]).filter((s) => s.paid).length,
+    sharesCount: (shares as { paid: boolean }[]).length,
+  }));
 }
 
 export type DeliveryDetail = {
@@ -82,6 +95,7 @@ export type DeliveryDetail = {
   cistern: CisternRow;
   readings: (ReadingRow & { photoUrl: string | null })[];
   shares: ShareRow[];
+  challenges: ChallengeRow[];
 };
 
 export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
@@ -97,7 +111,7 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
   if (error) throw error;
   if (!delivery) return null;
 
-  const [cistern, readings, shares] = await Promise.all([
+  const [cistern, readings, shares, challenges] = await Promise.all([
     supabase
       .from(TABLES.cisterns)
       .select("id, name, length_m, width_m, max_height_cm, households_count, household_labels")
@@ -111,10 +125,16 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
       .from(TABLES.shares)
       .select("id, household_label, amount_mxn, paid")
       .eq("delivery_id", id),
+    supabase
+      .from(TABLES.challenges)
+      .select("id, raised_by, note, created_at")
+      .eq("delivery_id", id)
+      .order("created_at"),
   ]);
   if (cistern.error) throw cistern.error;
   if (readings.error) throw readings.error;
   if (shares.error) throw shares.error;
+  if (challenges.error) throw challenges.error;
 
   // The bucket is private: photos are shown through links that expire in 1 hour
   const paths = readings.data.flatMap((r) => (r.photo_path ? [r.photo_path] : []));
@@ -137,5 +157,6 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
         cistern.data.household_labels.indexOf(a.household_label) -
         cistern.data.household_labels.indexOf(b.household_label),
     ),
+    challenges: challenges.data,
   };
 }

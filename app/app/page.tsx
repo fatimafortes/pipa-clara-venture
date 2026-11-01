@@ -51,7 +51,12 @@ async function OrganizerHome() {
                       href={`/app/pipa/${d.id}`}
                       className="flex items-center justify-between gap-3 px-5 py-4 text-lg"
                     >
-                      <span>Pipa del {formatDay(d.delivered_at)}</span>
+                      <span>
+                        Pipa del {formatDay(d.delivered_at)}
+                        <span className="block text-base text-muted">
+                          Ya pagaron: {d.paidCount} de {d.sharesCount}
+                        </span>
+                      </span>
                       <span className={d.verdict === "short" ? "font-semibold text-amber" : "text-muted"}>
                         {verdictLabel[d.verdict]} →
                       </span>

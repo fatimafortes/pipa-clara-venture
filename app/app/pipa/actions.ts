@@ -6,7 +6,7 @@ import { getCistern, requireUser } from "@/lib/data";
 import { isOwnPhotoPath } from "@/lib/photo";
 import { splitShares } from "@/lib/shares";
 import { PHOTO_BUCKET, TABLES } from "@/lib/supabase/names";
-import { validateDelivery, type FieldErrors } from "@/lib/validation";
+import { validateChallenge, validateDelivery, type FieldErrors } from "@/lib/validation";
 import { computeVerdict } from "@/lib/verdict";
 
 export type DeliveryFormState = {
@@ -139,4 +139,64 @@ export async function createDelivery(
 
   console.info("[createDelivery] saved", delivery.id, verdict.verdict);
   redirect(`/app/pipa/${delivery.id}`);
+}
+
+const isUuid = (value: string) => /^[0-9a-f-]{36}$/.test(value);
+
+// Paid / pending for one household. Only the organizer sees which; neighbors get a count.
+export async function setSharePaid(formData: FormData) {
+  const { supabase } = await requireUser();
+  const deliveryId = String(formData.get("deliveryId") ?? "");
+  const shareId = String(formData.get("shareId") ?? "");
+  const paid = formData.get("paid") === "true";
+  if (!isUuid(deliveryId) || !isUuid(shareId)) redirect("/app");
+
+  const { data, error } = await supabase
+    .from(TABLES.shares)
+    .update({ paid })
+    .eq("id", shareId)
+    .eq("delivery_id", deliveryId)
+    .select("id")
+    .single();
+  if (error || !data) {
+    console.error("[setSharePaid] update failed:", error?.code, error?.message);
+    redirect(`/app/pipa/${deliveryId}?error=pago`);
+  }
+
+  console.info("[setSharePaid]", shareId, paid ? "paid" : "pending");
+  redirect(`/app/pipa/${deliveryId}#pagos`);
+}
+
+export type ChallengeFormState = { errors: FieldErrors; values: Record<string, string> };
+
+// A challenge is evidence too: the database allows adding it, never editing or deleting it
+export async function createChallenge(
+  deliveryId: string,
+  _prev: ChallengeFormState,
+  formData: FormData,
+): Promise<ChallengeFormState> {
+  const { supabase } = await requireUser();
+  const values = { raisedBy: String(formData.get("raisedBy") ?? ""), note: String(formData.get("note") ?? "") };
+
+  const result = validateChallenge(values);
+  if (!result.ok) {
+    console.warn("[createChallenge] validation failed:", Object.keys(result.errors).join(", "));
+    return { errors: result.errors, values };
+  }
+
+  const { data, error } = await supabase
+    .from(TABLES.challenges)
+    .insert({ delivery_id: deliveryId, raised_by: result.value.raisedBy, note: result.value.note })
+    .select("id")
+    .single();
+  if (error || !data) {
+    console.error("[createChallenge] insert failed:", error?.code, error?.message, error?.details);
+    return {
+      errors: { form: `No se pudo guardar el desacuerdo. Intenta otra vez. (código: ${error?.code ?? "sin fila"})` },
+      values,
+    };
+  }
+
+  console.info("[createChallenge] saved", data.id);
+  redirect(`/app/pipa/${deliveryId}#desacuerdos`);
 }

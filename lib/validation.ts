@@ -131,6 +131,22 @@ export function validateDelivery(input: DeliveryInput, maxHeightCm: number): Res
   };
 }
 
+export type RaisedBy = "driver" | "neighbor" | "organizer";
+
+export function validateChallenge(input: { raisedBy: string; note: string }): Result<{ raisedBy: RaisedBy; note: string }> {
+  const errors: FieldErrors = {};
+  const raisedBy = input.raisedBy as RaisedBy;
+  if (!["driver", "neighbor", "organizer"].includes(raisedBy)) {
+    errors.raisedBy = "Elige quién plantea el desacuerdo.";
+  }
+  const note = input.note.trim();
+  if (note.length < 1 || note.length > 500) {
+    errors.note = "Escribe qué pasó, en máximo 500 letras.";
+  }
+  if (Object.keys(errors).length > 0) return { ok: false, errors };
+  return { ok: true, value: { raisedBy, note } };
+}
+
 export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
 // Checked on the original file, before it is shrunk for upload

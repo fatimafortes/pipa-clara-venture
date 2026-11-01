@@ -169,3 +169,16 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **No se pudo medir** (pump ran): correct verdict, no shortfall shown. ✔ Log: `saved 603e1dec-… couldnt_measure`.
 - **Bug (founder):** in "Litros que entraron (medidos)" the founder saw nothing where the measured value should be, which looked like a broken screen. Fix: say it in words, **"— (no se pudo medir)"**, in smaller grey text so it doesn't read as a missing number.
 - **Validation:** the log shows a rejected save on `beforeCm` (the −5 test). No rejection for letters in liters was logged; on a phone the `inputMode="numeric"` keyboard may not offer letters at all. The server check is still covered by unit tests.
+- **Validation on the phone:** the numeric keyboard doesn't offer letters at all; typing a wrong value shows the red message. ✔
+- **Persistence:** signed out and back in; all 4 deliveries are in "Pipas registradas", each opens with its data and photos. ✔
+- **F6 accepted (2026-11-01).**
+
+### F7 — Payments, challenges and WhatsApp summary
+
+- **Verdict screen order follows the mockup:** verdict card → "Cada hogar paga / Ya pagaron" → green "Mandar resumen por WhatsApp" → outlined "Registrar desacuerdo" → "El veredicto es evidencia, no sentencia…" (now true) → challenges → payments.
+- **Payments:** a "Pagos" section with one button per household ("Pendiente" amber / "Pagado ✓" teal), labeled "Solo tú ves quién ya pagó". Each tap is a Server Action that updates one share, **asks Supabase for the updated row** (lesson from the F5 bug) and redirects back to re-read from the database. A failed update shows "No se pudo guardar el pago" via `?error=pago`. The update also filters by `delivery_id`, and RLS limits it to her own rows.
+- **Challenges:** "Registrar desacuerdo" opens a form: who (El pipero / Un vecino / Yo) + note (1–500 chars, `validateChallenge`, with tests). Saved with the same verify-and-redirect pattern; listed under the verdict with who and when. **No edit or delete in the UI, and the database forbids both** (F3: no update/delete policy and no privilege). The form is keyed by the number of challenges, so it closes itself after a save.
+- **WhatsApp summary** (`lib/summary.ts`, 8 tests): date, liters claimed vs measured ("no se pudo medir" in words), verdict with margin, "before" reading time and whether the driver was present, amount per household with the fee breakdown, "Ya pagaron: X de N", and how many challenges exist. Opened with a `wa.me/?text=` link (no API, no bot).
+  - **No names, by construction:** `buildSummary` doesn't even receive household labels or challenge notes (a note could contain a name), so it can't leak them; challenges appear only as a count. A test also checks the text never contains "Depto", "Hogar" or "Casa".
+  - **The photo itself can't travel through `wa.me`** (text only). For Claudia, the summary says the "before" photo exists, its time and that the driver was present.
+- **History:** `/app` "Pipas registradas" now shows "Ya pagaron: X de N" under each delivery (one query, with shares embedded).
