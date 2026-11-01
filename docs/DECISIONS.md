@@ -115,3 +115,14 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   - **Bug found in my own test:** "A deletes a challenge" expected "0 rows deleted", but got `permission denied`, because the privilege revoke blocks it before RLS even runs. That is a stronger block, so the test now accepts both as "no se borró".
   - **Proved the test can fail:** with RLS removed from `pc_cisterns` on purpose, 4 checks turned FALLA (B sees, edits and deletes A's cistern, and creates one in A's name).
 - **F3 accepted (2026-11-01):** the founder ran the migration in "semestre", added her second Google account to Test users, signed in once with it, and ran `f3-rls-test.sql` with both real accounts: **14/14 PASA** in the real Supabase (including storage). The second account can't see, change or delete the first one's rows or photos.
+
+### F5 — Register the cistern
+
+- **Validation in one pure module** `lib/validation.ts` (`validateCistern`, `validateDelivery`, `validatePhoto`), used by the Server Actions and covered by Vitest (15 tests, incl. PACKET §13: negative level, letters in liters, 10 MB photo → rejected). The database CHECK constraints from F3 repeat the same limits as a second line.
+- **Numbers accept "2.5" or "2,5"**; letters, empty text and "1e3" are rejected. Liters, prices, fees and household count must be whole numbers.
+- **Household labels:** one box per household appears when she types the number, pre-filled "Hogar 1…N" so she only edits what she wants; each 1–30 chars, no duplicates (case-insensitive), hint "Nunca nombres completos".
+- **Form keeps what she typed on error** (`useActionState` returns the values; React 19 resets forms after an action otherwise).
+- **Data access** in `lib/data.ts` (`requireUser`, `getCistern`, …): every query goes through RLS; the app never filters by user id by hand, so a missing filter can't leak data.
+- **One cistern per organizer** in the UI (the first one created); the schema allows more for later.
+- `/app` shows the form when there is no cistern, otherwise its summary, including "cada centímetro de nivel son X L" so she can check the arithmetic by hand.
+- **Tested by me:** unit tests, lint, types, build. **Saving to Supabase is tested by the founder** (I can't sign in with Google).
