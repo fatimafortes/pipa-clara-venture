@@ -8,6 +8,7 @@ import { buildSummary, whatsappLink } from "@/lib/summary";
 import { computeVerdict } from "@/lib/verdict";
 import { setSharePaid } from "../actions";
 import { ChallengeForm } from "./ChallengeForm";
+import { PaidButton } from "./PaidButton";
 
 export const metadata: Metadata = {
   title: "Veredicto",
@@ -197,15 +198,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
                 <input type="hidden" name="deliveryId" value={delivery.id} />
                 <input type="hidden" name="shareId" value={s.id} />
                 <input type="hidden" name="paid" value={s.paid ? "false" : "true"} />
-                <button
-                  type="submit"
-                  aria-label={`${s.household_label}: ${s.paid ? "pagado, tocar para marcar pendiente" : "pendiente, tocar para marcar pagado"}`}
-                  className={`min-w-32 rounded-full px-4 py-2 text-lg font-semibold ${
-                    s.paid ? "bg-teal text-white" : "border-2 border-amber bg-white text-amber"
-                  }`}
-                >
-                  {s.paid ? "Pagado ✓" : "Pendiente"}
-                </button>
+                <PaidButton label={s.household_label} paid={s.paid} />
               </form>
             </li>
           ))}

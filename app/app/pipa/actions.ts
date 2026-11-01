@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getCistern, requireUser } from "@/lib/data";
@@ -164,7 +165,8 @@ export async function setSharePaid(formData: FormData) {
   }
 
   console.info("[setSharePaid]", shareId, paid ? "paid" : "pending");
-  redirect(`/app/pipa/${deliveryId}#pagos`);
+  // Re-renders this page with the saved value, without jumping back to the top
+  refresh();
 }
 
 export type ChallengeFormState = { errors: FieldErrors; values: Record<string, string> };
