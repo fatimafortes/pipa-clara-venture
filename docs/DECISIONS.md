@@ -126,3 +126,21 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **One cistern per organizer** in the UI (the first one created); the schema allows more for later.
 - `/app` shows the form when there is no cistern, otherwise its summary, including "cada centímetro de nivel son X L" so she can check the arithmetic by hand.
 - **Tested by me:** unit tests, lint, types, build. **Saving to Supabase is tested by the founder** (I can't sign in with Google).
+
+### F6 — Record a delivery and get the verdict (the core)
+
+- **"Nueva pipa"** (`/app/pipa/nueva`), one form in three sections that follow the real order: 1. la pipa (liters claimed, price, fee per household default $2), 2. antes (level, photo, "El pipero estuvo presente"), 3. después (level, photo, "bomba prendida", "se desbordó"). An empty "after" level is allowed; the engine then says "No se pudo medir".
+- **Photos upload the moment they are taken**, straight from the phone to the private bucket (browser client + the F3 storage policies). If both went up at "Guardar", the before and after photos would carry the same time, and the time is part of the evidence. Uploading from the browser also avoids the Server Action body limit (~1 MB).
+- **The reading's time is Supabase's, not the phone's:** the Server Action looks up each photo's `created_at` in Storage and saves it as `taken_at`. A phone clock can be changed; the server's can't. Without a photo, `taken_at` is the save time.
+- **Photos are shrunk in the browser** to ≤ 1600 px JPEG (~300 KB): faster on mobile data, and redrawing on a canvas **drops EXIF, including the GPS location** phones embed. The 5 MB / JPG-PNG rule is checked on the original file (PACKET §11); the bucket enforces it again.
+- **Photo paths are checked on the server:** only `<her user id>/<uuid>.jpg` is accepted, so a tampered form can't point a reading at someone else's file.
+- **Saving:** validate → compute the verdict with F4 → insert delivery → insert readings and shares. PostgREST can't wrap several inserts in one transaction, so if readings or shares fail, the action **deletes the delivery** (cascade removes its children): no half-saved delivery.
+- **Shares** = `splitShares(price + fee × households, households)`, assigned to the labels in the order she typed them.
+- **Verdict screen** (`/app/pipa/[id]`), as in the mockup: claimed vs measured ("—" when it couldn't be measured), verdict card (teal = consistente, amber = faltante with the missing liters, grey = no se pudo medir) with the reason and the margin, both photo thumbnails with time and level (before also says "con el pipero presente" / "sin el pipero"), "Cada hogar paga" and "Ya pagaron: X de N".
+  - Added a **breakdown line** ("Pipa $1,800 + cuota de Pipa Clara $24 (12 × $2) = $1,824"): Claudia's persona quits if "a fee shows up in her share without explanation".
+  - The reason text is recomputed from the saved numbers (same pure function), so it is never out of sync with the formula.
+  - Photos come from the private bucket through **signed links that expire in 1 hour**.
+- **Dates and times use `America/Mexico_City` explicitly:** Vercel runs in UTC, so without it an 8:02 reading would show as 14:02.
+- **Minimal list of deliveries on `/app`** (date + verdict, newest first), because the F6 acceptance needs her to "find it again after signing out and back in". The fuller history is F7.
+- **Known risk for the persona test:** the form lives in one page for the ~40 min the truck takes. Photos are safe as soon as they upload, but if the phone reloads the page, the typed numbers are lost. Watch for it in Rosa's walkthrough.
+- **Tested by me:** unit tests, lint, types, build, and that the new pages redirect to `/login` without a session. **The full flow with photos must be tested by the founder on her phone.**

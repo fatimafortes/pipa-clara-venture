@@ -1,0 +1,138 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getCistern, requireUser } from "@/lib/data";
+import { isOwnPhotoPath } from "@/lib/photo";
+import { splitShares } from "@/lib/shares";
+import { PHOTO_BUCKET, TABLES } from "@/lib/supabase/names";
+import { validateDelivery, type FieldErrors } from "@/lib/validation";
+import { computeVerdict } from "@/lib/verdict";
+
+export type DeliveryFormState = {
+  errors: FieldErrors;
+  values: Record<string, string>;
+};
+
+// When Supabase received the photo: the reading's timestamp, set by the server, not the phone
+async function photoUploadedAt(supabase: SupabaseClient, path: string): Promise<string | null> {
+  const [folder, file] = path.split("/");
+  const { data } = await supabase.storage.from(PHOTO_BUCKET).list(folder, { search: file, limit: 1 });
+  return data?.find((object) => object.name === file)?.created_at ?? null;
+}
+
+export async function createDelivery(
+  _prev: DeliveryFormState,
+  formData: FormData,
+): Promise<DeliveryFormState> {
+  const { supabase, user } = await requireUser();
+  const cistern = await getCistern();
+  if (!cistern) redirect("/app");
+
+  const field = (key: string) => String(formData.get(key) ?? "");
+  const values = {
+    litersClaimed: field("litersClaimed"),
+    priceMxn: field("priceMxn"),
+    feeMxn: field("feeMxn"),
+    beforeCm: field("beforeCm"),
+    afterCm: field("afterCm"),
+    driverPresent: field("driverPresent"),
+    pumpRan: field("pumpRan"),
+    overflowed: field("overflowed"),
+  };
+
+  const result = validateDelivery(
+    { ...values, pumpRan: values.pumpRan === "on", overflowed: values.overflowed === "on" },
+    Number(cistern.max_height_cm),
+  );
+  if (!result.ok) return { errors: result.errors, values };
+  const input = result.value;
+
+  // Only accept photo paths inside her own folder
+  const photo = (key: string) => (isOwnPhotoPath(field(key), user.id) ? field(key) : null);
+  const beforePhoto = photo("beforePhoto");
+  const afterPhoto = photo("afterPhoto");
+  const now = new Date().toISOString();
+  const [beforeTakenAt, afterTakenAt] = await Promise.all([
+    beforePhoto ? photoUploadedAt(supabase, beforePhoto) : null,
+    afterPhoto ? photoUploadedAt(supabase, afterPhoto) : null,
+  ]);
+
+  const verdict = computeVerdict({
+    lengthM: Number(cistern.length_m),
+    widthM: Number(cistern.width_m),
+    maxHeightCm: Number(cistern.max_height_cm),
+    beforeCm: input.beforeCm,
+    afterCm: input.afterCm,
+    litersClaimed: input.litersClaimed,
+    pumpRan: input.pumpRan,
+    overflowed: input.overflowed,
+  });
+
+  const { data: delivery, error: deliveryError } = await supabase
+    .from(TABLES.deliveries)
+    .insert({
+      cistern_id: cistern.id,
+      liters_claimed: input.litersClaimed,
+      price_mxn: input.priceMxn,
+      fee_mxn: input.feeMxn,
+      pump_ran: input.pumpRan,
+      overflowed: input.overflowed,
+      measured_liters: verdict.measuredLiters,
+      verdict: verdict.verdict,
+    })
+    .select("id")
+    .single();
+
+  const failed = (where: string, error: { code?: string; message: string }) => {
+    console.error(`[createDelivery] ${where}`, error.code, error.message);
+    return {
+      errors: { form: "No se pudo guardar la pipa. Revisa tu conexión e intenta otra vez." },
+      values,
+    };
+  };
+  if (deliveryError) return failed("delivery", deliveryError);
+
+  const readings = [
+    {
+      delivery_id: delivery.id,
+      kind: "before",
+      level_cm: input.beforeCm,
+      photo_path: beforePhoto,
+      driver_present: values.driverPresent === "on",
+      taken_at: beforeTakenAt ?? now,
+    },
+    ...(input.afterCm === null
+      ? []
+      : [
+          {
+            delivery_id: delivery.id,
+            kind: "after",
+            level_cm: input.afterCm,
+            photo_path: afterPhoto,
+            driver_present: false,
+            taken_at: afterTakenAt ?? now,
+          },
+        ]),
+  ];
+
+  const total = input.priceMxn + input.feeMxn * cistern.households_count;
+  const shares = splitShares(total, cistern.households_count).map((amount, i) => ({
+    delivery_id: delivery.id,
+    household_label: cistern.household_labels[i],
+    amount_mxn: amount,
+  }));
+
+  const [readingsResult, sharesResult] = await Promise.all([
+    supabase.from(TABLES.readings).insert(readings),
+    supabase.from(TABLES.shares).insert(shares),
+  ]);
+  const childError = readingsResult.error ?? sharesResult.error;
+  if (childError) {
+    // Don't leave a delivery without its readings or shares; deleting it removes its children too
+    await supabase.from(TABLES.deliveries).delete().eq("id", delivery.id);
+    return failed("readings/shares", childError);
+  }
+
+  redirect(`/app/pipa/${delivery.id}`);
+}

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
-import { getCistern, requireUser } from "@/lib/data";
-import { formatLiters } from "@/lib/format";
+import { getCistern, getDeliveries, requireUser } from "@/lib/data";
+import { formatDay, formatLiters } from "@/lib/format";
 import { litersPerCm } from "@/lib/verdict";
 import { signOut } from "./actions";
 import { CisternForm } from "./CisternForm";
@@ -19,15 +20,53 @@ export default function AppPage() {
   );
 }
 
+const verdictLabel = {
+  consistent: "Consistente",
+  short: "Faltante",
+  couldnt_measure: "No se pudo medir",
+} as const;
+
 async function OrganizerHome() {
   const { user } = await requireUser();
-  const cistern = await getCistern();
+  const [cistern, deliveries] = await Promise.all([getCistern(), getDeliveries()]);
 
   return (
     <div className="space-y-6">
+      {cistern && (
+        <>
+          <Link
+            href="/app/pipa/nueva"
+            className="block rounded-xl bg-teal px-6 py-5 text-center text-xl font-semibold text-white hover:bg-teal-dark"
+          >
+            Nueva pipa
+          </Link>
+
+          {deliveries.length > 0 && (
+            <section className="space-y-2">
+              <h2 className="text-xl font-bold">Pipas registradas</h2>
+              <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+                {deliveries.map((d) => (
+                  <li key={d.id}>
+                    <Link
+                      href={`/app/pipa/${d.id}`}
+                      className="flex items-center justify-between gap-3 px-5 py-4 text-lg"
+                    >
+                      <span>Pipa del {formatDay(d.delivered_at)}</span>
+                      <span className={d.verdict === "short" ? "font-semibold text-amber" : "text-muted"}>
+                        {verdictLabel[d.verdict]} →
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
+      )}
+
       {cistern ? (
         <section className="space-y-3 rounded-2xl border border-line bg-white p-5">
-          <h1 className="text-3xl font-bold">{cistern.name}</h1>
+          <h1 className="text-2xl font-bold">{cistern.name}</h1>
           <p className="text-lg text-muted">
             {Number(cistern.length_m)} × {Number(cistern.width_m)} m · altura máxima{" "}
             {Number(cistern.max_height_cm)} cm · {cistern.households_count} hogares
