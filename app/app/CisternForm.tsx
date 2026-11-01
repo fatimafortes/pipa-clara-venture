@@ -38,7 +38,7 @@ export function CisternForm() {
           label="Largo (m)"
           name="lengthM"
           inputMode="decimal"
-          placeholder="3"
+          placeholder="ej. 3"
           defaultValue={state.values.lengthM}
           error={state.errors.lengthM}
         />
@@ -46,7 +46,7 @@ export function CisternForm() {
           label="Ancho (m)"
           name="widthM"
           inputMode="decimal"
-          placeholder="2.5"
+          placeholder="ej. 2.5"
           defaultValue={state.values.widthM}
           error={state.errors.widthM}
         />
@@ -56,7 +56,7 @@ export function CisternForm() {
         hint="Hasta dónde se puede llenar sin desbordarse."
         name="maxHeightCm"
         inputMode="decimal"
-        placeholder="180"
+        placeholder="ej. 180"
         defaultValue={state.values.maxHeightCm}
         error={state.errors.maxHeightCm}
       />

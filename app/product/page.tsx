@@ -75,8 +75,8 @@ export default function ProductPage() {
           10.
         </p>
         <p className="leading-relaxed">
-          <strong>Margen</strong> = ±2 cm por lectura. En una cisterna de 2 × 2 m son ±160 L,
-          menos del 2% de una pipa de 10,000 L.
+          <strong>Margen de medición</strong> = 2 cm por lectura, para arriba o para abajo. En una
+          cisterna de 2 × 2 m es un margen de 160 litros, menos del 2% de una pipa de 10,000 L.
         </p>
         <p className="leading-relaxed">
           Sin inteligencia artificial: es aritmética que cualquiera puede revisar.

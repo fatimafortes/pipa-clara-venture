@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { splitShares } from "./shares";
+import { splitShares, valueOfMeasured } from "./shares";
+
+describe("valueOfMeasured", () => {
+  it("the mockup: 8,700 of 10,000 L at $1,800 → the water that entered is worth $1,566", () => {
+    expect(valueOfMeasured(8_700, 10_000, 1_800)).toBe(1_566);
+  });
+
+  it("never more than the price, never negative", () => {
+    expect(valueOfMeasured(10_500, 10_000, 1_800)).toBe(1_800);
+    expect(valueOfMeasured(-400, 10_000, 1_800)).toBe(0);
+  });
+});
 
 const sum = (shares: number[]) => shares.reduce((a, b) => a + b, 0);
 

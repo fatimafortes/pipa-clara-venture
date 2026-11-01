@@ -58,7 +58,10 @@ export function ChallengeForm({ deliveryId }: { deliveryId: string }) {
           defaultValue={state.values.note}
           className="block w-full rounded-xl border-2 border-line px-4 py-3 text-lg outline-none focus:border-teal"
         />
-        <span className="block text-base text-muted">Máximo 500 letras. Queda guardado y no se puede borrar.</span>
+        <span className="block text-base text-muted">
+          Máximo 500 letras. Queda guardado y no se puede borrar.{" "}
+          <strong>Esta nota aparece en el resumen de WhatsApp: no escribas nombres.</strong>
+        </span>
         {state.errors.note && <span className="block text-base font-medium text-amber">{state.errors.note}</span>}
       </label>
 

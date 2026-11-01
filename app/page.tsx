@@ -49,7 +49,8 @@ export default function HomePage() {
           <p className="text-sm font-bold tracking-widest text-amber">VEREDICTO</p>
           <p className="text-3xl font-bold text-amber">Faltante: 1,300 L</p>
           <p className="mt-1 text-amber">
-            Entraron menos litros de los cotizados, más allá del margen de medición (±300 L).
+            Entraron menos litros de los que dijo el pipero, más allá del margen de medición de 300
+            litros.
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">

@@ -16,7 +16,8 @@ export function Field({
         {...input}
         aria-invalid={error ? true : undefined}
         aria-describedby={errorId}
-        className={`block w-full rounded-xl border-2 bg-white px-4 py-3 text-xl ${
+        // Light italic placeholders, so an example never looks like a value already typed
+        className={`block w-full rounded-xl border-2 bg-white px-4 py-3 text-xl placeholder:italic placeholder:text-muted/50 ${
           error ? "border-amber" : "border-line focus:border-teal"
         } outline-none`}
       />

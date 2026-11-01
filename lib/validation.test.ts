@@ -4,6 +4,7 @@ import {
   validateChallenge,
   validateCistern,
   validateDelivery,
+  validateDriverPayment,
   validatePhoto,
   type CisternInput,
   type DeliveryInput,
@@ -104,6 +105,19 @@ describe("validateDelivery (PACKET §13 form cases)", () => {
     const result = validateDelivery({ ...delivery, afterCm: "" }, 200);
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value.afterCm).toBeNull();
+  });
+});
+
+describe("validateDriverPayment", () => {
+  it("full price → the price; another amount → that amount", () => {
+    expect(validateDriverPayment({ choice: "full", otherMxn: "" }, 1_800)).toEqual({ ok: true, value: 1_800 });
+    expect(validateDriverPayment({ choice: "other", otherMxn: "1566" }, 1_800)).toEqual({ ok: true, value: 1_566 });
+  });
+
+  it("rejects an empty, decimal, negative or above-price amount", () => {
+    for (const otherMxn of ["", "1566.5", "-1", "1801", "mil"]) {
+      expect(validateDriverPayment({ choice: "other", otherMxn }, 1_800).ok).toBe(false);
+    }
   });
 });
 

@@ -3,11 +3,11 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getCistern, requireUser } from "@/lib/data";
+import { getCistern, getDelivery, requireUser } from "@/lib/data";
 import { isOwnPhotoPath } from "@/lib/photo";
 import { splitShares } from "@/lib/shares";
 import { PHOTO_BUCKET, TABLES } from "@/lib/supabase/names";
-import { validateChallenge, validateDelivery, type FieldErrors } from "@/lib/validation";
+import { validateChallenge, validateDelivery, validateDriverPayment, type FieldErrors } from "@/lib/validation";
 import { computeVerdict } from "@/lib/verdict";
 
 export type DeliveryFormState = {
@@ -201,4 +201,50 @@ export async function createChallenge(
 
   console.info("[createChallenge] saved", data.id);
   redirect(`/app/pipa/${deliveryId}#desacuerdos`);
+}
+
+export type DriverPaymentState = { errors: FieldErrors; values: Record<string, string> };
+
+// "¿Cuánto le pagaste al pipero?" (persona-test fix): the app labels, the organizer decides.
+// Saves what she actually paid and re-splits the households' shares on that amount.
+export async function setDriverPayment(
+  deliveryId: string,
+  _prev: DriverPaymentState,
+  formData: FormData,
+): Promise<DriverPaymentState> {
+  const { supabase } = await requireUser();
+  const detail = await getDelivery(deliveryId);
+  if (!detail) redirect("/app");
+  const { delivery, shares } = detail;
+
+  const values = { choice: String(formData.get("choice") ?? ""), otherMxn: String(formData.get("otherMxn") ?? "") };
+  const result = validateDriverPayment(values, delivery.price_mxn);
+  if (!result.ok) return { errors: result.errors, values };
+  const paidMxn = result.value;
+
+  const failed = (where: string, error: { code?: string; message: string } | null) => {
+    console.error(`[setDriverPayment] ${where} failed:`, error?.code, error?.message);
+    return { errors: { form: `No se pudo guardar el pago. Intenta otra vez. (código: ${error?.code ?? "sin fila"})` }, values };
+  };
+
+  const { data, error } = await supabase
+    .from(TABLES.deliveries)
+    .update({ paid_mxn: paidMxn })
+    .eq("id", deliveryId)
+    .select("id")
+    .single();
+  if (error || !data) return failed("delivery", error);
+
+  // Shares follow the money actually paid; who already paid stays as it was
+  const amounts = splitShares(paidMxn + delivery.fee_mxn * shares.length, shares.length);
+  const updates = await Promise.all(
+    shares.map((share, i) =>
+      supabase.from(TABLES.shares).update({ amount_mxn: amounts[i] }).eq("id", share.id).select("id").single(),
+    ),
+  );
+  const shareError = updates.find((u) => u.error || !u.data);
+  if (shareError) return failed("shares", shareError.error);
+
+  console.info("[setDriverPayment]", deliveryId, paidMxn, "of", delivery.price_mxn);
+  redirect(`/app/pipa/${deliveryId}`);
 }

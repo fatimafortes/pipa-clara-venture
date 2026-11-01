@@ -24,15 +24,15 @@ export function DeliveryForm({ userId, maxHeightCm }: { userId: string; maxHeigh
           label="Litros que dice el pipero"
           name="litersClaimed"
           inputMode="numeric"
-          placeholder="10000"
+          placeholder="ej. 10000"
           defaultValue={v.litersClaimed}
           error={state.errors.litersClaimed}
         />
         <Field
-          label="Precio que pagaste ($)"
+          label="Precio que pide el pipero ($)"
           name="priceMxn"
           inputMode="numeric"
-          placeholder="1800"
+          placeholder="ej. 1800"
           defaultValue={v.priceMxn}
           error={state.errors.priceMxn}
         />

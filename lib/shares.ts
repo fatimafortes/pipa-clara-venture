@@ -1,3 +1,10 @@
+// What the water that actually entered is worth, at the driver's own price per liter:
+// measured / claimed × price, in whole pesos, never more than the price
+export function valueOfMeasured(measuredLiters: number, litersClaimed: number, priceMxn: number): number {
+  if (measuredLiters <= 0) return 0;
+  return Math.min(priceMxn, Math.round((measuredLiters / litersClaimed) * priceMxn));
+}
+
 // Splits a delivery's total (price + fee) into equal shares in whole pesos.
 // Never loses or invents a peso: the remainder goes one peso at a time to the
 // first households in the list, so the shares always add up to the total.

@@ -131,6 +131,22 @@ export function validateDelivery(input: DeliveryInput, maxHeightCm: number): Res
   };
 }
 
+// "¿Cuánto le pagaste al pipero?": the full price, or another amount up to it
+export function validateDriverPayment(
+  input: { choice: string; otherMxn: string },
+  priceMxn: number,
+): Result<number> {
+  if (input.choice === "full") return { ok: true, value: priceMxn };
+  const value = parseNumber(input.otherMxn);
+  if (input.choice !== "other" || value === null || !Number.isInteger(value) || value < 0 || value > priceMxn) {
+    return {
+      ok: false,
+      errors: { otherMxn: `Escribe un monto entero de pesos entre 0 y ${priceMxn} (lo que pedía el pipero).` },
+    };
+  }
+  return { ok: true, value };
+}
+
 export type RaisedBy = "driver" | "neighbor" | "organizer";
 
 export function validateChallenge(input: { raisedBy: string; note: string }): Result<{ raisedBy: RaisedBy; note: string }> {

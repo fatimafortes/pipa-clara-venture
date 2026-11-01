@@ -1,5 +1,6 @@
 // The engine (PACKET §6): compares the liters the driver claims against the liters
 // measured in the cistern. Pure arithmetic, no AI: the organizer can check it by hand.
+import { formatLitersWord } from "./format";
 
 export type Verdict = "consistent" | "short" | "couldnt_measure";
 
@@ -62,7 +63,7 @@ export function computeVerdict(input: VerdictInput): VerdictResult {
       measuredLiters,
       toleranceLiters,
       verdict: "consistent",
-      reason: `Entraron los litros cotizados, dentro del margen de medición (±${toleranceLiters} L).`,
+      reason: `Entraron los litros que dijo el pipero, dentro del margen de medición de ${formatLitersWord(toleranceLiters)}.`,
     };
   }
 
@@ -70,6 +71,6 @@ export function computeVerdict(input: VerdictInput): VerdictResult {
     measuredLiters,
     toleranceLiters,
     verdict: "short",
-    reason: `Entraron menos litros de los cotizados, más allá del margen de medición (±${toleranceLiters} L).`,
+    reason: `Entraron menos litros de los que dijo el pipero, más allá del margen de medición de ${formatLitersWord(toleranceLiters)}.`,
   };
 }

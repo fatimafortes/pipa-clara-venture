@@ -98,7 +98,9 @@ describe("computeVerdict", () => {
     expect(result.measuredLiters).toBe(8_700);
     expect(result.toleranceLiters).toBe(300);
     expect(result.verdict).toBe("short");
-    expect(result.reason).toContain("±300 L");
+    expect(result.reason).toBe(
+      "Entraron menos litros de los que dijo el pipero, más allá del margen de medición de 300 litros.",
+    );
   });
 
   it("decimal dimensions don't leave floating-point crumbs in the liters", () => {

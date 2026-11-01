@@ -28,6 +28,8 @@ export type DeliveryRow = {
   overflowed: boolean;
   measured_liters: number | null;
   verdict: Verdict;
+  // What she actually paid the driver; null = the full price
+  paid_mxn: number | null;
 };
 
 export type ReadingRow = {
@@ -79,7 +81,7 @@ export async function getDeliveries(): Promise<(DeliveryRow & { paidCount: numbe
   const { data, error } = await supabase
     .from(TABLES.deliveries)
     .select(
-      `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, ${TABLES.shares}(paid)`,
+      `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn, ${TABLES.shares}(paid)`,
     )
     .order("delivered_at", { ascending: false });
   if (error) throw error;
@@ -103,7 +105,7 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
 
   const { data: delivery, error } = await supabase
     .from(TABLES.deliveries)
-    .select("id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict")
+    .select("id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn")
     .eq("id", id)
     .maybeSingle();
   // An id that isn't a uuid is just "not found", not a crash

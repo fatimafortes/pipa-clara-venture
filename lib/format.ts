@@ -8,6 +8,11 @@ export function formatLiters(liters: number): string {
   return `${number.format(liters)} L`;
 }
 
+// "300 litros": for sentences, where "±300 L" read like a code to the persona test
+export function formatLitersWord(liters: number): string {
+  return `${number.format(liters)} litros`;
+}
+
 export function formatMxn(pesos: number): string {
   return `$${number.format(pesos)}`;
 }

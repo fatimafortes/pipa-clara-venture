@@ -7,7 +7,9 @@ import { formatDay, formatLiters, formatMxn, formatTime } from "@/lib/format";
 import { buildSummary, whatsappLink } from "@/lib/summary";
 import { computeVerdict } from "@/lib/verdict";
 import { setSharePaid } from "../actions";
+import { valueOfMeasured } from "@/lib/shares";
 import { ChallengeForm } from "./ChallengeForm";
+import { DriverPaymentForm } from "./DriverPaymentForm";
 import { PaidButton } from "./PaidButton";
 
 export const metadata: Metadata = {
@@ -67,21 +69,26 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
   const high = Math.max(...amounts);
   const paid = shares.filter((s) => s.paid).length;
   const fee = delivery.fee_mxn * shares.length;
+  // What she actually paid the driver (persona test); null = the full price
+  const paidToDriver = delivery.paid_mxn ?? delivery.price_mxn;
+  const worth = measured === null ? null : valueOfMeasured(measured, delivery.liters_claimed, delivery.price_mxn);
 
-  // Built from counts and numbers only: no household labels, no challenge notes
+  // No household labels: the summary function doesn't even receive them
   const summary = buildSummary({
     deliveredAt: delivery.delivered_at,
     litersClaimed: delivery.liters_claimed,
     measuredLiters: measured,
     verdict: delivery.verdict,
     toleranceLiters: explained.toleranceLiters,
-    beforeTakenAt: before?.taken_at ?? null,
+    before: before ? { takenAt: before.taken_at, hasPhoto: Boolean(before.photo_path) } : null,
+    after: after ? { takenAt: after.taken_at, hasPhoto: Boolean(after.photo_path) } : null,
     driverPresent: before?.driver_present ?? false,
     priceMxn: delivery.price_mxn,
+    paidMxn: paidToDriver,
     feeMxn: delivery.fee_mxn,
     shareAmounts: amounts,
     paidCount: paid,
-    challengesCount: challenges.length,
+    challenges: challenges.map((c) => ({ raisedBy: c.raised_by, note: c.note })),
   });
 
   return (
@@ -128,6 +135,16 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
         </div>
       </section>
 
+      {delivery.verdict === "short" && worth !== null && (
+        <DriverPaymentForm
+          key={paidToDriver}
+          deliveryId={delivery.id}
+          priceMxn={delivery.price_mxn}
+          worthMxn={worth}
+          paidMxn={paidToDriver}
+        />
+      )}
+
       <section className="space-y-3 rounded-2xl border border-line bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p>
@@ -141,8 +158,11 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
           </span>
         </div>
         <p className="text-base text-muted">
-          Pipa {formatMxn(delivery.price_mxn)} + cuota de Pipa Clara {formatMxn(fee)} ({shares.length} ×{" "}
-          {formatMxn(delivery.fee_mxn)}) = {formatMxn(delivery.price_mxn + fee)}, en partes iguales.
+          {paidToDriver < delivery.price_mxn
+            ? `Le pagaste al pipero ${formatMxn(paidToDriver)} de ${formatMxn(delivery.price_mxn)}. `
+            : ""}
+          Pipa {formatMxn(paidToDriver)} + cuota de Pipa Clara {formatMxn(fee)} ({shares.length} ×{" "}
+          {formatMxn(delivery.fee_mxn)}) = {formatMxn(paidToDriver + fee)}, en partes iguales.
         </p>
       </section>
 

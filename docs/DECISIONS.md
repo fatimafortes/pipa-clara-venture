@@ -220,3 +220,19 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Watch the open risks above:** does the form survive the wait, does the Google screen confuse her, and is the WhatsApp text enough for the neighbors without the photo?
 - **Pricing (CHARTER, Week 13):** ask whether the MXN 2 per household fee feels fair after she sees a real verdict.
 - **North star starts counting:** delivery #1 of 5 measured without anyone reminding her.
+
+### Persona-test fix (2026-11-01, before submitting)
+
+- **Worst confusion, shared by Rosa and Claudia:** the verdict said "Faltante: 1,300 L" but the households were still charged the full price, so **the verdict had no consequence**. Fix, keeping CHARTER/Blueprint condition 4 (the app labels, the organizer decides):
+  1. **"Lo que sí entró vale $X"** on a short verdict: `valueOfMeasured()` = measured / claimed × price, whole pesos, never above the price (mockup: 8,700 / 10,000 × $1,800 = **$1,566**; tests).
+     - Then **"¿Cuánto le pagaste al pipero?"**: "El precio completo" or "Otro monto" (0 to the price; `validateDriverPayment`, tests).
+     - Saving stores `pc_deliveries.paid_mxn` and **re-splits every household's share on what was actually paid**, keeping who already paid. Same verify-the-row pattern as F5.
+     - The breakdown on screen says "Le pagaste al pipero $X de $Y".
+     - **Schema change:** migration `20261101230000_pc_paid_to_driver.sql` adds one nullable column (`null` = full price; check 0–20,000). Validated in PGlite together with F3 (RLS test still 14/14). **Deploy order matters:** the new code selects `paid_mxn`, so the migration must run in "semestre" *before* the push, or every delivery page would fail. Verified from outside: before the migration, the API answers `42703 column … paid_mxn does not exist`.
+     - The delivery form's "Precio que pagaste" became **"Precio que pide el pipero"**, since what she pays is now decided after the verdict.
+  2. **WhatsApp summary:** time of the **before AND after** readings (with or without photo), **how much the driver was paid and why** (full price despite the shortfall / what the water that entered is worth / another amount agreed), shares on the paid amount, and **one line per challenge with its note**.
+     - This **reverses my F7 decision** to send challenges as a count only. The founder decided notes go in, so the challenge form now warns: "Esta nota aparece en el resumen de WhatsApp: no escribas nombres." Household labels are still never received by the summary function.
+     - Organizer challenges read "La organizadora" in the summary, since "Yo" makes no sense to a neighbor.
+  3. **Wording:** "cotizados" → "los que dijo el pipero"; "±300 L" → "margen de medición de 300 litros" (`formatLitersWord`), everywhere it is shown: verdict reason, summary, home example, /product.
+  4. **Placeholders** now read "ej. 10000", in light italic grey, so an example never looks like a value already typed.
+- Tests: 49 passing (new: `valueOfMeasured`, `validateDriverPayment`, 4 payment/challenge summary cases, "no ±" check).
