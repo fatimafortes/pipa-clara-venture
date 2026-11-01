@@ -184,3 +184,39 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **History:** `/app` "Pipas registradas" now shows "Ya pagaron: X de N" under each delivery (one query, with shares embedded).
 - **F7 accepted (2026-11-01):** the founder tested payments, a challenge and the WhatsApp summary on her phone. Logs confirm: `[setSharePaid] … paid/pending`, `[createChallenge] saved …` ×2, no errors.
 - **Bug found in the logs, not reported by the founder:** the same share was marked "paid" up to **9 times in ~7 seconds**. A tap that is still saving looked like a tap that failed, so she tapped again. Two causes: the button gave no feedback while saving, and the action redirected to the same URL plus `#pagos`, which the router can treat as a hash jump and render late. Fix: `PaidButton` (client, `useFormStatus`) shows "Guardando…" and is disabled while saving; the action now calls `refresh()` (Next 16's way to re-render the current page after a Server Action) instead of redirecting, so the page updates in place without jumping to the top. Rosa would have hit this with the driver waiting.
+
+### F8 — Production check on the real domain
+
+- **Checked from outside, on `https://www.pipa-clara.site`:**
+  - `/`, `/product`, `/about`, `/login` → 200, `lang="es"`.
+  - `/app`, `/app/pipa/nueva`, `/app/pipa/<id>` without a session → 307 to `/login`.
+  - `pipa-clara.site` and `http://` → 308 to `https://www.pipa-clara.site`.
+  - All five `pc_` tables, anonymous → 401. Photo bucket: anonymous list → empty (RLS), public URL → 400 (private bucket).
+  - Secrets: no service-role or secret key in the repo, in git history (only `.env.example` was ever committed) or in the production browser JS. The one `sb_secret_` match in the JS is supabase-js checking a key's prefix, not a key.
+- **Full flow by the founder on the real domain, on her phone:** Google sign-in (F2), cistern (F5), deliveries with photos and all three verdicts (F6), sign out / sign in with everything still there, payments, challenge and WhatsApp summary with no names (F7). Each save confirmed in the Vercel logs.
+- **Last fix verified in production:** payment buttons show "Guardando…", update in place without jumping to the top, and "Ya pagaron" goes up by one.
+- **PACKET §13 "find at least one bug, fix it, redeploy, log it":** seven are logged above. Five were found by the founder (header "Entrar", Redirect URL fallback to another app, cistern not saved, blank "measured", "1 Issue" in dev); two by me (my own RLS test, and repeated payment taps seen in the logs).
+- **F8 accepted (2026-11-01). Final deploy = this commit.**
+
+### Cuts and deviations (for the grader)
+
+- **Nothing was cut** from the build prompt; the time-budget cut list (history list, challenge polish) wasn't needed.
+- **Deliberate deviations, each explained above:** shared Supabase project "semestre" with a `pc_` prefix; `pc_challenges` and the photo bucket allow no update/delete (CHARTER principle 2, evidence); F4 was built before F3 to save time; extra columns `household_labels` and `driver_present`.
+
+### Open risks to watch
+
+- **The delivery form lives in one page for ~40 minutes:** photos are safe once uploaded, but typed numbers are lost if the phone reloads the page.
+- **Google's consent screen shows the shared "semestre" client's name**, not "Pipa Clara"; Rosa may hesitate at an unfamiliar name.
+- **`wa.me` carries text only:** Claudia sees that a "before" photo exists, with its time and the driver present, but not the photo itself.
+
+### Persona pass — today, by the founder (before submitting)
+
+- Rosa (55) walks the screenshots in order with the driver "waiting"; Claudia (41) reads only the WhatsApp summary. Log every hesitation and fix the worst one before the deadline (PACKET §13).
+
+## Tomorrow's first move (Week 13)
+
+- **The real test with María on her next delivery.** Before the truck: register her cistern with her (dimensions with a tape measure, household labels like "Depto 3", never names). With the truck: take the "before" reading with the driver present, then the "after"; time how long each reading takes while the driver waits. After: she sends the WhatsApp summary to her group and marks payments as they come in.
+- **Watch the kill conditions (PACKET §13):** can the delivery actually be measured (pump to the tinaco, overflow)? Does she take both readings without help? Do the neighbors accept the summary?
+- **Watch the open risks above:** does the form survive the wait, does the Google screen confuse her, and is the WhatsApp text enough for the neighbors without the photo?
+- **Pricing (CHARTER, Week 13):** ask whether the MXN 2 per household fee feels fair after she sees a real verdict.
+- **North star starts counting:** delivery #1 of 5 measured without anyone reminding her.
