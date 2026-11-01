@@ -80,3 +80,22 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Dev "1 Issue":** `Route "/app": Next.js encountered the unstable value Date.now() while prerendering`. Cause: the Supabase client checks token expiry with `Date.now()`, and Next 16 (`cacheComponents`) tried to prerender that part. Fix: `createClient()` in `lib/supabase/server.ts` calls `await connection()` first, which tells Next "this runs only when a real request arrives". Fixed once, for every server use.
 - **Also in the log:** `AuthApiError: Invalid Refresh Token: Refresh Token Not Found`. Likely leftover `sb-<ref>-auth-token` cookies on `localhost:3000` from earlier "semestre" apps (same Supabase project, same cookie name, same host). Harmless: the stale cookie is treated as "no session". One code exchange also failed before a retry worked; `/auth/callback` now logs the reason (`error.code`, or Google's `error` when there is no code) so the next failure explains itself.
 - **Second Google account blocked:** the shared OAuth client is in Testing mode, which only lets listed Test users in. The founder adds the second account under Google Auth Platform → Audience → Test users (needed for the F3 RLS test).
+
+### F2 — Production bug and acceptance
+
+- **Bug (production):** signing in on `www.pipa-clara.site` ended on `http://localhost:3000/**?error=invalid_request&error_code=flow_state_already_used…` with a 404. Cause: `https://www.pipa-clara.site/auth/callback` was missing from Supabase → Authentication → URL Configuration → Redirect URLs. When the requested `redirectTo` isn't on that list, Supabase falls back to the project's **Site URL**, which in "semestre" is `http://localhost:3000/**` (set by an earlier app; we don't change it). The local dev server then had no page called `/**` → 404. The `flow_state_already_used` error came from the same failed round trip.
+- **Fix:** the founder added the exact Redirect URL (https, `www.`, no trailing slash) and saved.
+- **Lesson:** in a shared project, a missing Redirect URL doesn't fail loudly; it silently sends the organizer to another app's Site URL. If a login ever lands on the wrong site, check the Redirect URLs list first.
+- **F2 accepted (2026-11-01):** the founder signed in with Google on `www.pipa-clara.site`, landed on `/app`, the header switched to "Mi cisterna", and "Salir" signed her out. Localhost passed earlier.
+
+### F4 — The engine: verdict and shares (pure functions + tests)
+
+- Built **before F3** to save time: it depends on nothing (no database, no login), so it could be finished and committed while the Supabase steps wait for the founder.
+- **`lib/verdict.ts` → `computeVerdict()`**: measured = (after − before) × length × width × 10; tolerance = 4 cm × length × width × 10 (±2 cm per reading). Order of checks: missing reading → pump ran → overflowed → after ≥ max height → compare. Any of the first four → `couldnt_measure`, and then **`measuredLiters` is `null`**: we never show a liters number we don't trust.
+- **"after = max height" counts as couldn't measure** (the spec says "after ≥ max height"): a full cistern may have spilled.
+- **Liters are rounded to whole liters** (`Math.round`). Without it, decimal dimensions like 1.1 × 1.1 m produce `1210.0000000000002` (floating point). There is a test for it.
+- **Level going down** gives a negative measured value and `short`, never `consistent`.
+- **`reason` is in Spanish** because it is shown on screen; it includes the margin, as in the mockup ("más allá del margen de medición (±300 L)").
+- **`lib/shares.ts` → `splitShares()`**: floor(total / households) each; the remainder goes one peso at a time to the **first households in the list**. Deterministic and easy to explain; the difference between any two households is at most $1. Rejects cents, negative totals and non-whole household counts.
+- **Tests (Vitest, 18 passing):** every PACKET §13 case, plus the boundary at exactly −160 L, the mockup example (3 × 2.5 m, 8,700 of 10,000 L, ±300 L → short), the float-rounding case, and a sweep of 2–40 households × 8 totals checking that no peso is lost or invented.
+- **Dependency fix:** `vitest@5` needs `@types/node` ≥ 22; the scaffold had `^20`. Upgraded to `^24` (matches local Node 24) instead of `--force`. Plain Vitest, no jsdom / React Testing Library: we only test pure functions.
