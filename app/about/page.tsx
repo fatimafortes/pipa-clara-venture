@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ExampleBadge } from "@/components/ExampleBadge";
 
 export const metadata: Metadata = {
   title: "Por qué",
@@ -57,30 +56,41 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-line bg-white p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-2xl font-bold">El caso 10 a 1</h2>
-          <ExampleBadge />
+      {/* The 10:1 case from the founder's Verdict, gate 2: impossible proof vs. near-free witnessed evidence */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold">El caso 10 a 1</h2>
+        <p className="leading-relaxed">
+          Las pipas incompletas son raras. Lo que cambia no es cuánto dinero se recupera, sino que
+          por fin se puede probar.
+        </p>
+
+        <div className="space-y-2 rounded-2xl border-2 border-amber bg-amber-soft p-5">
+          <p className="text-sm font-bold tracking-widest text-amber">HOY</p>
+          <p className="text-xl font-bold">Probar un faltante es imposible.</p>
+          <ul className="list-disc space-y-1 pl-5 leading-relaxed">
+            <li>Es la palabra del pipero contra una sospecha.</li>
+            <li>La pelea cae entre vecinos.</li>
+            <li>El reclamo a la compañía se ignora.</li>
+          </ul>
         </div>
-        <p className="leading-relaxed">
-          Una vecindad de 12 hogares paga $1,800 por una pipa de 10,000 L. Llegan 8,700 L: faltan
-          1,300 L.
-        </p>
-        <dl className="divide-y divide-line">
-          <div className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="text-muted">Pagado por agua que no llegó</dt>
-            <dd className="text-2xl font-bold text-amber">$234</dd>
-          </div>
-          <div className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="text-muted">Cuota de Pipa Clara por esa pipa (12 × $2)</dt>
-            <dd className="text-2xl font-bold text-teal">$24</dd>
-          </div>
-        </dl>
-        <p className="leading-relaxed">
-          Un solo faltante como éste cuesta casi lo mismo que <strong>10 pipas medidas</strong>.
-          Por eso vale la pena medir siempre, aunque casi nunca falte agua: el día que falta, ya
-          tienes la prueba.
-        </p>
+
+        <div className="space-y-2 rounded-2xl border-2 border-teal bg-white p-5">
+          <p className="text-sm font-bold tracking-widest text-teal">CON PIPA CLARA</p>
+          <p className="text-xl font-bold">Una cinta métrica y dos fotos con hora.</p>
+          <p className="leading-relaxed">
+            Eso convierte la sospecha en evidencia que los dos lados atestiguaron: la lectura de
+            &quot;antes&quot; se toma con el pipero presente. Y casi no cuesta: $2 por hogar por
+            pipa.
+          </p>
+        </div>
+
+        <div className="space-y-2 rounded-2xl bg-teal-soft p-5">
+          <p className="text-xl font-bold">Y en las pipas normales, también sirve.</p>
+          <p className="leading-relaxed">
+            Un veredicto <strong>consistente</strong> les dice a los vecinos que, si el agua se
+            acaba antes, es por consumo, no por el pipero. Eso termina la pelea.
+          </p>
+        </div>
       </section>
     </div>
   );
