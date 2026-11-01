@@ -145,7 +145,7 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Known risk for the persona test:** the form lives in one page for the ~40 min the truck takes. Photos are safe as soon as they upload, but if the phone reloads the page, the typed numbers are lost. Watch for it in Rosa's walkthrough.
 - **Tested by me:** unit tests, lint, types, build, and that the new pages redirect to `/login` without a session. **The full flow with photos must be tested by the founder on her phone.**
 
-### F5 — Bug: the cistern "saved" but nothing was stored (in progress)
+### F5 — Bug: the cistern "saved" but nothing was stored (fixed)
 
 - **Reported by the founder (production, phone):** pressed "Guardar cisterna", saw no error, reloaded `/app` and got the empty form again; `pc_cisterns` was empty in Supabase.
 - **What the evidence shows so far:**
@@ -157,4 +157,8 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   2. **Success was assumed, not verified.** "No error from the insert" was treated as "saved". Fix: `.insert(...).select("id").single()`, so Supabase must return the saved row; no row → visible error with its code.
   3. **The server logged almost nothing**, so the logs can't say what happened. Fix: log validation failures (which fields), insert failures (code, message, details, hint) and successes (row id), in both actions.
 - **Also changed:** after saving the cistern, `redirect("/app")` instead of `refresh()`, so the page is re-read from the database instead of trusting any cached response.
-- **Next step:** reproduce on `localhost:3000` (no Vercel cache in between, server log visible) to find the root cause, then confirm in production.
+- **Verified:**
+  - Localhost: founder saved "cisterna de prueba"; `/app` then showed it, read back from the database after the redirect.
+  - Production (commit `805ab3d`), with her second Google account: saved, still there after reload. Vercel log: `POST /app 200 … BYPASS | [createCistern] saved f6ab5eab-…`.
+- **Root cause, honestly:** not proven. The old code (`refresh()` after an insert that was never verified) ran only in production, behind Vercel's cache, and one of her saves was answered from that cache (`cache=HIT`) without running the action. The most likely cause is that cached answer combined with the old "no error = saved" logic; both are gone now. Every save is now verified and logged, so if it ever happens again, the log will say exactly why.
+- **Lesson:** a save that can fail must say so where the user is looking, and "no error" is not proof of "saved": ask the database for the saved row.
