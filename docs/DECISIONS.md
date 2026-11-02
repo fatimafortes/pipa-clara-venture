@@ -209,7 +209,7 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Google's consent screen shows the shared "semestre" client's name**, not "Pipa Clara"; Rosa may hesitate at an unfamiliar name.
 - **`wa.me` carries text only:** Claudia sees that a "before" photo exists, with its time and the driver present, but not the photo itself.
 
-### Persona pass — today, by the founder (before submitting)
+### Persona pass — done by the founder (2026-11-01), see "Persona-test fix" below
 
 - Rosa (55) walks the screenshots in order with the driver "waiting"; Claudia (41) reads only the WhatsApp summary. Log every hesitation and fix the worst one before the deadline (PACKET §13).
 
@@ -217,6 +217,7 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 
 - **The real test with María on her next delivery.** Before the truck: register her cistern with her (dimensions with a tape measure, household labels like "Depto 3", never names). With the truck: take the "before" reading with the driver present, then the "after"; time how long each reading takes while the driver waits. After: she sends the WhatsApp summary to her group and marks payments as they come in.
 - **Watch the kill conditions (PACKET §13):** can the delivery actually be measured (pump to the tinaco, overflow)? Does she take both readings without help? Do the neighbors accept the summary?
+- **Before María's delivery, fix the `PGRST303` sign-in risk** (retry once, see "Open risk found in the final log review").
 - **Watch the open risks above:** does the form survive the wait, does the Google screen confuse her, and is the WhatsApp text enough for the neighbors without the photo?
 - **Pricing (CHARTER, Week 13):** ask whether the MXN 2 per household fee feels fair after she sees a real verdict.
 - **North star starts counting:** delivery #1 of 5 measured without anyone reminding her.
@@ -236,3 +237,12 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   3. **Wording:** "cotizados" → "los que dijo el pipero"; "±300 L" → "margen de medición de 300 litros" (`formatLitersWord`), everywhere it is shown: verdict reason, summary, home example, /product.
   4. **Placeholders** now read "ej. 10000", in light italic grey, so an example never looks like a value already typed.
 - Tests: 49 passing (new: `valueOfMeasured`, `validateDriverPayment`, 4 payment/challenge summary cases, "no ±" check).
+- **Migration run by the founder in "semestre"** before the push; verified from outside (the API answer changed from `42703 column does not exist` to `42501 permission denied`), then deployed (`727c7fe`). No errors in the logs after the deploy.
+- **Verified by the founder on her phone:** paying $1,566 of $1,800 re-split 12 households to **$132 or $133**; households already marked paid stayed paid; the WhatsApp text says "Se le pagó al pipero $1,566 de los $1,800 que pedía: lo que vale el agua que sí entró", with both reading times and the challenges, and **no names**. Log: `[setDriverPayment] a3c672d1-… 1566 of 1800`.
+- **Persona-test fix accepted (2026-11-01).**
+
+### Open risk found in the final log review
+
+- **`PGRST303 JWT issued at future`**, once, on `GET /app` **0.9 s after a Google sign-in**. The session token's "issued at" time was slightly ahead of the database's clock (clock skew between Supabase Auth and its API), so that one request failed. Her next requests 3 s later worked; it fixed itself.
+- **Why it matters:** it can happen right after signing in, which is María's first impression in Week 13.
+- **Proposed fix (not applied, to avoid an untested change on submission day):** in `lib/data.ts`, retry a query once after ~1 s when Supabase answers `PGRST303`. First thing to do in Week 13, before María's delivery.
