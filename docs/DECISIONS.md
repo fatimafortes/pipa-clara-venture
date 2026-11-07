@@ -246,3 +246,14 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **`PGRST303 JWT issued at future`**, once, on `GET /app` **0.9 s after a Google sign-in**. The session token's "issued at" time was slightly ahead of the database's clock (clock skew between Supabase Auth and its API), so that one request failed. Her next requests 3 s later worked; it fixed itself.
 - **Why it matters:** it can happen right after signing in, which is María's first impression in Week 13.
 - **Proposed fix (not applied, to avoid an untested change on submission day):** in `lib/data.ts`, retry a query once after ~1 s when Supabase answers `PGRST303`. First thing to do in Week 13, before María's delivery.
+
+---
+
+## Week 13
+
+### W1 — Retry once on `PGRST303` (open risk from Week 12)
+
+- **Helper** `lib/supabase/retry.ts` → `retryOnFutureToken(name, run)`: if Supabase answers `PGRST303` ("JWT issued at future"), wait 1 s and ask **once** more; log `[retry PGRST303] <name> ok|failed`. Any other answer (data or a different error) comes back untouched on the first try.
+- **It takes a function that builds the query, not a query already sent,** so the retry is a genuinely new request instead of relying on a Supabase query object being safe to await twice.
+- **Wrapped:** the three first reads in `lib/data.ts` (`getCistern`, `getDeliveries`, `getDelivery`), which are what a stranger sees right after signing in. **Not wrapped, on purpose:** the four follow-up reads inside `getDelivery` (they run only after the first read succeeded with the same token) and the saves in Server Actions (by the time she presses "Guardar", the ~1 s clock gap is long over). The spec says "nothing else changes".
+- **Tests (5, Vitest, fake query):** fails once then succeeds → data, 2 calls; fails twice → returns the error, never a third call; normal answer → 1 call; other errors (e.g. `42501`) not retried; waits ~1 s before the second try (fake timers). 54 tests passing.

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { Verdict } from "./verdict";
 import { createClient } from "./supabase/server";
 import { PHOTO_BUCKET, TABLES } from "./supabase/names";
+import { retryOnFutureToken } from "./supabase/retry";
 
 // Data access for the signed-in organizer. Every query goes through RLS,
 // so even without a filter it can only ever return her own rows.
@@ -66,24 +67,28 @@ export async function requireUser() {
 
 export async function getCistern(): Promise<CisternRow | null> {
   const { supabase } = await requireUser();
-  const { data, error } = await supabase
-    .from(TABLES.cisterns)
-    .select("id, name, length_m, width_m, max_height_cm, households_count, household_labels")
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
+  const { data, error } = await retryOnFutureToken("getCistern", () =>
+    supabase
+      .from(TABLES.cisterns)
+      .select("id, name, length_m, width_m, max_height_cm, households_count, household_labels")
+      .order("created_at")
+      .limit(1)
+      .maybeSingle(),
+  );
   if (error) throw error;
   return data;
 }
 
 export async function getDeliveries(): Promise<(DeliveryRow & { paidCount: number; sharesCount: number })[]> {
   const { supabase } = await requireUser();
-  const { data, error } = await supabase
-    .from(TABLES.deliveries)
-    .select(
-      `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn, ${TABLES.shares}(paid)`,
-    )
-    .order("delivered_at", { ascending: false });
+  const { data, error } = await retryOnFutureToken("getDeliveries", () =>
+    supabase
+      .from(TABLES.deliveries)
+      .select(
+        `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn, ${TABLES.shares}(paid)`,
+      )
+      .order("delivered_at", { ascending: false }),
+  );
   if (error) throw error;
   return data.map(({ [TABLES.shares]: shares, ...delivery }) => ({
     ...(delivery as DeliveryRow),
@@ -103,11 +108,13 @@ export type DeliveryDetail = {
 export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
   const { supabase } = await requireUser();
 
-  const { data: delivery, error } = await supabase
-    .from(TABLES.deliveries)
-    .select("id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn")
-    .eq("id", id)
-    .maybeSingle();
+  const { data: delivery, error } = await retryOnFutureToken("getDelivery", () =>
+    supabase
+      .from(TABLES.deliveries)
+      .select("id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn")
+      .eq("id", id)
+      .maybeSingle(),
+  );
   // An id that isn't a uuid is just "not found", not a crash
   if (error?.code === "22P02") return null;
   if (error) throw error;
