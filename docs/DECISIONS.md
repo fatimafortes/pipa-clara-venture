@@ -349,3 +349,28 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   - Verified in PGlite: the four migrations in order; `f3-rls-test.sql` 14/14; `w13-events-rls-test.sql` 14/14 (an unknown name is still rejected after the swap); 0 rows left. An organizer who signed in through Google once and came back already signed in on two more days → **3 days, 1 Google sign-in, regresó: sí** (the old query said "no"). Types, lint, 74 tests, build OK.
   - **Deploy order:** the migration must run before the push. The code wouldn't break without it, but every `app_opened` would be rejected and the visits lost.
   - **Migration run by the founder in "semestre" (2026-11-08): "Success".** From outside, `pc_events` is still locked (anonymous read and insert of `app_opened` → `401 / 42501`). The CHECK itself can't be seen from outside (visitors are refused before it applies), so **the proof that `app_opened` is accepted is pending:** `app_opened` rows after the deploy, and `w13-events-rls-test.sql` 14/14 with both accounts.
+- **W6 fix verified in production (2026-11-08), founder:** opened `/app` on her phone while still signed in → a new **`app_opened`** row, no new `signed_in`. `w13-events-rls-test.sql` **14/14 PASA** with both accounts (incl. "A registra que abrió la app"), so the new CHECK is in.
+- **Old pipa check (W4 acceptance) ✔:** a Week 12 pipa, opened with the original account, looks as before plus the range and the grey box ("Medida una vez…"), and the same 300 L margin.
+- **PACKET §13 mechanical pass, all checked off:**
+  - [x] `computeVerdict()`: no repeat = Week 12; spread 0 → 1 cm floor; spread 3 cm → triple margin; below the claim inside the margin → consistent + `belowClaimInsideMargin`; couldn't-measure → no liters (74 unit tests).
+  - [x] Event log: each event writes one row (founder's phone); B can't read A's events and an unknown name is rejected (RLS test 14/14 in "semestre").
+  - [x] `PGRST303`: simulated error retried once, then succeeds (unit tests, W1).
+  - [x] Sign-in with a Google account that was never a test user (W2).
+  - [x] Find at least one bug, fix it, redeploy, log it: **the return signal missed returning organizers who were still signed in**, fixed with `app_opened` and redeployed (`6af1cca`). Also caught before pushing: the Week 13 migration hadn't run (would have broken every pipa page).
+  - [x] Security floor from outside: anonymous access to `pc_events` (read and insert) denied; no secrets in the repo, its history or the browser JS.
+- **W6 accepted (2026-11-08).**
+
+### Week 13 so far
+
+- **Done and live:** W1 (PGRST303 retry), W2 (strangers can sign in, privacy page), W3 (event log + RLS), W4+W5 (repeat reading, margin, range, honest "inside the margin" message, pump question), W6 (mechanical pass + return-signal fix).
+- **Cut, per the time budget and in its order:** the "spread ≥ 3 cm" warning text, and the range in the WhatsApp summary.
+- **Deviations, each explained above:** privacy page (needed to publish Google sign-in); `verdict_viewed` / `app_opened` logged from the browser and `summary_sent` on the same tap; pump question as information, not an input; the "unos X L menos" line replaces the reason; seventh event name `app_opened`.
+- **Not built, on purpose:** W7 waits for the five sessions (PACKET §10, Slice B).
+
+## Tomorrow's first move (Week 13, sessions)
+
+- **Run the five real-user sessions** (at least three strangers) at `www.pipa-clara.site`, one sheet each (PACKET §13): role and where found, stranger yes/no, story, tasks A–D with times, **the spread of the two "before" readings in cm**, 2–3 exact quotes, commitment. Consent first; roles, never names.
+- **During each session, watch what I couldn't test:** the Google screen now says "Pipa Clara" (does anyone hesitate?); is "Mide otra vez" understood without help; is the "unos X L menos, dentro del margen" sentence understood read aloud; does the form survive the wait for the truck.
+- **Kill-condition check:** if most spreads are ≥ 3 cm, the margin is hiding short loads; say it in the pain ranking, and consider bringing back the cut ≥ 3 cm warning.
+- **Return signal:** run `supabase/checks/w13-return-signal.sql` a few days after the sessions; a tester counts as back at `dias_con_visita` ≥ 2.
+- **Then W7:** write `## 14. Addendum` in `docs/PACKET.md` (the user quote + the pain ranking), commit `docs: packet addendum, #1 pain from real users`, and only then build the smallest fix, with before/after screenshot and timing.
