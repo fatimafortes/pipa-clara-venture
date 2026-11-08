@@ -278,3 +278,10 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Linked from the footer** on every page (Google checks the URL loads); the link is padded to a larger tap area on phones.
 - **Branding URLs to enter:** homepage `https://www.pipa-clara.site`, privacy policy `https://www.pipa-clara.site/privacidad`.
 - Checked: types, lint, 54 tests, build; `/privacidad` answers 200 without a session (not redirected to `/login`).
+- **Privacy page deployed** as `1b728ce`.
+- **Google Auth Platform, done by the founder (2026-11-08):** Branding filled in (app name **"Pipa Clara"**, support and developer email `fatimafortes.builds@gmail.com`, homepage `https://www.pipa-clara.site`, privacy policy `https://www.pipa-clara.site/privacidad`, **no logo**, so no brand review). Audience → **Publish app** → status **"In production"**. Supabase → "Allow new users to sign up" is **on**.
+- **Scopes:** not reported from the Data Access screen. Indirect evidence that only the basic `openid` / `email` / `profile` scopes are in use: the app requests no extra scopes in code (`GoogleButton.tsx` passes none), and Google showed **no "unverified app" warning**, which it does show for sensitive scopes in production. Check the Data Access screen directly if anything changes.
+- **Side effect on the other "semestre" apps (shared OAuth client):** their Google sign-in screen now also says "Pipa Clara", and any Google account can now sign into them, not just test users. Each of them must rely on its own RLS, not on the test-user list. Pipa Clara does (a new account sees only its own, empty data).
+- **Week 12 open risk closed:** the consent screen no longer shows an unfamiliar client name to Pipa Clara users.
+- **Fallback (Test users per tester) not needed.**
+- **W2 accepted (2026-11-08):** a Google account that was **never a test user** signed in on `www.pipa-clara.site` on a phone, saw **no warning screen**, and landed on `/app` with the empty cistern form.
