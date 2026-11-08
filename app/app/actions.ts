@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/data";
+import { logEvent } from "@/lib/events";
 import { createClient } from "@/lib/supabase/server";
 import { TABLES } from "@/lib/supabase/names";
 import { validateCistern, type FieldErrors } from "@/lib/validation";
@@ -65,6 +66,7 @@ export async function createCistern(
   }
 
   console.info("[createCistern] saved", data.id);
+  await logEvent("cistern_created");
   // A full redirect re-reads /app from the database instead of trusting any cached page
   redirect("/app");
 }

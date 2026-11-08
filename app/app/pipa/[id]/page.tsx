@@ -10,6 +10,7 @@ import { setSharePaid } from "../actions";
 import { valueOfMeasured } from "@/lib/shares";
 import { ChallengeForm } from "./ChallengeForm";
 import { DriverPaymentForm } from "./DriverPaymentForm";
+import { LogVerdictViewed, SummaryButton } from "./EventLoggers";
 import { PaidButton } from "./PaidButton";
 
 export const metadata: Metadata = {
@@ -93,6 +94,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
 
   return (
     <div className="space-y-5">
+      <LogVerdictViewed deliveryId={delivery.id} />
       <Link href="/app" className="inline-block py-1 text-lg font-medium text-teal">
         ← Mi cisterna
       </Link>
@@ -166,14 +168,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
         </p>
       </section>
 
-      <a
-        href={whatsappLink(summary)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block w-full rounded-xl bg-whatsapp px-6 py-4 text-center text-lg font-semibold text-white"
-      >
-        Mandar resumen por WhatsApp
-      </a>
+      <SummaryButton href={whatsappLink(summary)} deliveryId={delivery.id} />
       <ChallengeForm key={challenges.length} deliveryId={delivery.id} />
       <p className="text-center text-base text-muted">
         El veredicto es evidencia, no sentencia. Cualquier desacuerdo queda guardado junto a él.

@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getCistern, getDelivery, requireUser } from "@/lib/data";
+import { logEvent } from "@/lib/events";
 import { isOwnPhotoPath } from "@/lib/photo";
 import { splitShares } from "@/lib/shares";
 import { PHOTO_BUCKET, TABLES } from "@/lib/supabase/names";
@@ -139,6 +140,7 @@ export async function createDelivery(
   }
 
   console.info("[createDelivery] saved", delivery.id, verdict.verdict);
+  await logEvent("delivery_saved", delivery.id);
   redirect(`/app/pipa/${delivery.id}`);
 }
 
@@ -200,7 +202,17 @@ export async function createChallenge(
   }
 
   console.info("[createChallenge] saved", data.id);
+  await logEvent("challenge_saved", deliveryId);
   redirect(`/app/pipa/${deliveryId}#desacuerdos`);
+}
+
+// Called from the verdict page in the browser: when it opens, and when she presses
+// "Mandar resumen por WhatsApp". Only these two names; anything else is ignored.
+export async function logDeliveryEvent(name: "verdict_viewed" | "summary_sent", deliveryId: string) {
+  if ((name !== "verdict_viewed" && name !== "summary_sent") || !isUuid(deliveryId)) return;
+  // No requireUser(): its redirect would move her to /login from a background call.
+  // Without a session the insert is simply rejected by RLS and logged.
+  await logEvent(name, deliveryId);
 }
 
 export type DriverPaymentState = { errors: FieldErrors; values: Record<string, string> };

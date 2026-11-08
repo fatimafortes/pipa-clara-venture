@@ -6,6 +6,7 @@ export const TABLES = {
   readings: "pc_readings",
   shares: "pc_shares",
   challenges: "pc_challenges",
+  events: "pc_events",
 } as const;
 
 export const PHOTO_BUCKET = "pc_readings";

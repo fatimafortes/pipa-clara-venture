@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { logEvent } from "@/lib/events";
 import { createClient } from "@/lib/supabase/server";
 
 // Google sends the organizer back here (via Supabase) with a one-time code.
@@ -11,6 +12,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // One row per sign-in: signed_in on different days is the return signal
+      await logEvent("signed_in");
       return NextResponse.redirect(`${origin}/app`);
     }
     console.error("[auth/callback] code exchange failed:", error.code, error.message);
