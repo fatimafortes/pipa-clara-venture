@@ -257,3 +257,24 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **It takes a function that builds the query, not a query already sent,** so the retry is a genuinely new request instead of relying on a Supabase query object being safe to await twice.
 - **Wrapped:** the three first reads in `lib/data.ts` (`getCistern`, `getDeliveries`, `getDelivery`), which are what a stranger sees right after signing in. **Not wrapped, on purpose:** the four follow-up reads inside `getDelivery` (they run only after the first read succeeded with the same token) and the saves in Server Actions (by the time she presses "Guardar", the ~1 s clock gap is long over). The spec says "nothing else changes".
 - **Tests (5, Vitest, fake query):** fails once then succeeds → data, 2 calls; fails twice → returns the error, never a third call; normal answer → 1 call; other errors (e.g. `42501`) not retried; waits ~1 s before the second try (fake timers). 54 tests passing.
+- **W1 accepted (2026-11-06):** pushed as `0e310c9`; the founder signed out and back in on `www.pipa-clara.site` on her phone and landed on `/app` with her cistern and pipas; a pipa page looks the same.
+
+### W2 — Strangers can sign in
+
+- **Blocked by Google:** the shared OAuth client can't be published ("In production") until Branding has an app name, a support email, a homepage URL **and a privacy policy URL**. Pipa Clara had no privacy page.
+- **Needed deviation from the packet:** PACKET §6 doesn't list a privacy page, but A5 ("strangers can sign in") can't happen without one, and A5 is on the never-cut list. So I added the smallest thing that unblocks it: one static public page, `/privacidad`, no new data, no new behavior. Logged here as a deviation, not as scope creep.
+- **`/privacidad`** (Spanish, plain language for Rosa, dated 8 Nov 2026): what is stored (Google email, name and profile-photo link; cistern; household labels like "Depto 3"; deliveries; readings; photos without location; payments; challenges; the event log with no IP or device data), why, who can see it, private photos, what we don't do, the services used, how to ask for deletion.
+- **Only claims the app actually keeps, checked against the code before writing:**
+  - "Name and profile photo": Supabase stores what Google sends at sign-in in `auth.users`, including the name and the avatar link, even though Pipa Clara never shows them. Listed so the page isn't incomplete.
+  - "Photos without location": true since F6 (redrawn on a canvas in the browser, which drops EXIF/GPS).
+  - "Only you": RLS on every `pc_` table (F3, 14/14 PASA). **Said honestly that the administrator has technical access to the database**; "nobody else can see it" would be false.
+  - "Neighbors": they only see the WhatsApp summary she chooses to send, including challenge notes (Week 12 persona-test fix), and what goes to WhatsApp stays in WhatsApp.
+  - "No trackers": no analytics in the code; the Inter font is bundled with the site at build time, so visitors' browsers make no Google Fonts requests; only Supabase session cookies.
+  - "Vercel receives technical data such as the IP": true for any hosting; our own event log doesn't store it.
+  - **Event log:** described as it will be when W3 ships this week (actions and time only). Update the page if W3 changes.
+  - **No promised deadline** for deletion and no legal-sounding guarantees; just "we'll tell you by email when it's done".
+- **Deletion, for whoever does it:** deleting the user in Supabase → Authentication cascades every `pc_` row (all tables reference `auth.users … on delete cascade`). **Photos in the `pc_readings` bucket do not cascade:** delete the folder `<user id>/` in Storage by hand first.
+- **Support email** on the page: `fatimafortes.builds@gmail.com`, the same one as Google Branding (founder's choice). It's in one constant at the top of `app/privacidad/page.tsx`.
+- **Linked from the footer** on every page (Google checks the URL loads); the link is padded to a larger tap area on phones.
+- **Branding URLs to enter:** homepage `https://www.pipa-clara.site`, privacy policy `https://www.pipa-clara.site/privacidad`.
+- Checked: types, lint, 54 tests, build; `/privacidad` answers 200 without a session (not redirected to `/login`).
