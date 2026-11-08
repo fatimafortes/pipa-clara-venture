@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Field, FormError, SubmitErrors } from "@/components/Field";
+import { CisternSizeGuide } from "@/components/MeasureGuide";
 import { createCistern, type CisternFormState } from "./actions";
 
 const initialState: CisternFormState = { errors: {}, values: {}, labels: [] };
@@ -33,6 +34,7 @@ export function CisternForm() {
         maxLength={60}
         error={state.errors.name}
       />
+      <CisternSizeGuide />
       <div className="grid grid-cols-2 gap-4">
         <Field
           label="Largo (m)"

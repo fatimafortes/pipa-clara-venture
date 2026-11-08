@@ -367,6 +367,27 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Deviations, each explained above:** privacy page (needed to publish Google sign-in); `verdict_viewed` / `app_opened` logged from the browser and `summary_sent` on the same tap; pump question as information, not an input; the "unos X L menos" line replaces the reason; seventh event name `app_opened`.
 - **Not built, on purpose:** W7 waits for the five sessions (PACKET §10, Slice B).
 
+### Persona-test fix (Week 13): "¿Cómo mido?"
+
+- **Persona pass (PACKET §13, Layer 1), done by the founder:** Don Chuy (58, security guard, Iztapalapa, 6 families, distrusts apps, reads slowly). **Worst confusion, the one that would make him quit: measuring.** He doesn't know what tool to use, whether to measure from the top or from the bottom, or his cistern's size, and the pipero won't wait.
+- **This is the Layer 1 persona fix, not W7 / Slice B.** W7 stays reserved for the #1 pain from the five real sessions, after the PACKET §14 addendum. A synthetic persona can't stand in for that ranking. If the real sessions show the same pain, this fix becomes the "before" to measure against.
+- **Fix, the smallest one (founder's spec):** a short guide in plain Spanish, as one component `components/MeasureGuide.tsx`, using a native `<details>` that opens and closes without JavaScript:
+  - **"¿Cómo mido?" at the start of "Nueva pipa":**
+    - **what to use:** a stick or a tape measure, and a stick with marks every centimeter works;
+    - **where:** the water height from the floor of the cistern; push the stick straight down to the floor, pull it out and see how high it got wet; always at the same spot;
+    - **when:** before the hose goes in, and after it stops and the water is still.
+  - **"¿Cómo mido mi cisterna?" next to the dimensions on the cistern form:**
+    - measured **once, with time, not while the pipero waits**;
+    - length and width inside, wall to wall, in meters;
+    - max height from the floor to where water spills when full, in cm;
+    - if you don't know a measurement, measure it before your first pipa.
+- **"Open the first time" with no new data:** the "Nueva pipa" guide starts **open while the organizer has no pipas yet** (`getDeliveries().length === 0`, data the app already has), then starts closed but stays one tap away. The cistern form only appears once (before the first cistern), so its guide is always open. No `localStorage`, no new column, no migration.
+- **Added the "wet mark" method** ("sácalo y mira hasta dónde se mojó"): "from the floor" alone doesn't tell someone with a stick where to read. It matches the existing hint "Mide desde el fondo".
+- **Before / after (on-screen text):**
+  - **Before:** "Nueva pipa" started straight with "1. La pipa"; the only measuring help was the hint "Mide desde el fondo. Máximo N cm." under the level. The cistern form showed "Largo (m)", "Ancho (m)" with no explanation, and only "Hasta dónde se puede llenar sin desbordarse." under the max height.
+  - **After:** an open teal box "¿Cómo mido?" (what / where / when) under the "Nueva pipa" title on the first pipa, and an open box "¿Cómo mido mi cisterna?" right above the dimensions. Screenshots on the founder's phone (I can't sign in to take them).
+- Checked: types, lint, 74 tests, build; no "robo / robó / te robaron".
+
 ## Tomorrow's first move (Week 13, sessions)
 
 - **Run the five real-user sessions** (at least three strangers) at `www.pipa-clara.site`, one sheet each (PACKET §13): role and where found, stranger yes/no, story, tasks A–D with times, **the spread of the two "before" readings in cm**, 2–3 exact quotes, commitment. Consent first; roles, never names.

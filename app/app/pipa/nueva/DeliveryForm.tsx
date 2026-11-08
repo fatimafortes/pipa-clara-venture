@@ -2,12 +2,21 @@
 
 import { useActionState, useState } from "react";
 import { Checkbox, Field, FormError, SubmitErrors } from "@/components/Field";
+import { MeasureGuide } from "@/components/MeasureGuide";
 import { createDelivery, type DeliveryFormState } from "../actions";
 import { PhotoField } from "./PhotoField";
 
 const initialState: DeliveryFormState = { errors: {}, values: {} };
 
-export function DeliveryForm({ userId, maxHeightCm }: { userId: string; maxHeightCm: number }) {
+export function DeliveryForm({
+  userId,
+  maxHeightCm,
+  firstDelivery,
+}: {
+  userId: string;
+  maxHeightCm: number;
+  firstDelivery: boolean;
+}) {
   const [state, action, pending] = useActionState(createDelivery, initialState);
   const [uploads, setUploads] = useState(0);
   const onUploadingChange = (uploading: boolean) => setUploads((n) => n + (uploading ? 1 : -1));
@@ -16,6 +25,7 @@ export function DeliveryForm({ userId, maxHeightCm }: { userId: string; maxHeigh
   return (
     <form action={action} className="space-y-6">
       <h1 className="text-3xl font-bold">Nueva pipa</h1>
+      <MeasureGuide open={firstDelivery} />
       <FormError message={state.errors.form} />
 
       <section className="space-y-4 rounded-2xl border border-line bg-white p-5">

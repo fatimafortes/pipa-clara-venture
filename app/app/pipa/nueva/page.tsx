@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getCistern, requireUser } from "@/lib/data";
+import { getCistern, getDeliveries, requireUser } from "@/lib/data";
 import { DeliveryForm } from "./DeliveryForm";
 
 export const metadata: Metadata = {
@@ -18,8 +18,15 @@ export default function NewDeliveryPage() {
 
 async function NewDelivery() {
   const { user } = await requireUser();
-  const cistern = await getCistern();
+  const [cistern, deliveries] = await Promise.all([getCistern(), getDeliveries()]);
   if (!cistern) redirect("/app");
 
-  return <DeliveryForm userId={user.id} maxHeightCm={Number(cistern.max_height_cm)} />;
+  return (
+    <DeliveryForm
+      userId={user.id}
+      maxHeightCm={Number(cistern.max_height_cm)}
+      // "¿Cómo mido?" starts open until her first pipa is saved; no new data needed
+      firstDelivery={deliveries.length === 0}
+    />
+  );
 }
