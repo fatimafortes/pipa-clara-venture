@@ -4,6 +4,11 @@ const TIME_ZONE = "America/Mexico_City";
 
 const number = new Intl.NumberFormat("es-MX");
 
+// "9,750": for ranges, where the unit is said once at the end
+export function formatNumber(value: number): string {
+  return number.format(value);
+}
+
 export function formatLiters(liters: number): string {
   return `${number.format(liters)} L`;
 }

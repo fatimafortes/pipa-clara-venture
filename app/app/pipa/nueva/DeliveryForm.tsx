@@ -45,6 +45,12 @@ export function DeliveryForm({ userId, maxHeightCm }: { userId: string; maxHeigh
         />
       </section>
 
+      {/* Only informs: the "bomba prendida" checkbox in section 3 still decides the verdict */}
+      <div className="space-y-1 rounded-2xl border-2 border-amber bg-amber-soft p-5">
+        <p className="text-xl font-bold">¿Apagaste la bomba que sube el agua al tinaco?</p>
+        <p className="leading-relaxed">Si está prendida, el resultado dirá &quot;no se pudo medir&quot;.</p>
+      </div>
+
       <section className="space-y-4 rounded-2xl border border-line bg-white p-5">
         <h2 className="text-xl font-bold">2. Antes de que descargue</h2>
         <Field
@@ -55,6 +61,18 @@ export function DeliveryForm({ userId, maxHeightCm }: { userId: string; maxHeigh
           defaultValue={v.beforeCm}
           error={state.errors.beforeCm}
         />
+        {/* Precision check (PACKET §7): the spread between the two readings becomes the margin */}
+        <div className="space-y-3 rounded-xl bg-page p-4">
+          <p className="text-lg font-bold">Mide otra vez (recomendado)</p>
+          <Field
+            label="Nivel otra vez (cm)"
+            hint="Saca la regla, vuelve a meterla en el mismo lugar y anota el nivel otra vez."
+            name="beforeRepeatCm"
+            inputMode="decimal"
+            defaultValue={v.beforeRepeatCm}
+            error={state.errors.beforeRepeatCm}
+          />
+        </div>
         <PhotoField
           name="beforePhoto"
           label="Foto de la cinta métrica"

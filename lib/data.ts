@@ -36,6 +36,8 @@ export type DeliveryRow = {
 export type ReadingRow = {
   kind: "before" | "after";
   level_cm: number;
+  // The precision check: "before" read a second time; null = measured once (and on "after")
+  repeat_level_cm: number | null;
   photo_path: string | null;
   driver_present: boolean;
   taken_at: string;
@@ -128,7 +130,7 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
       .single(),
     supabase
       .from(TABLES.readings)
-      .select("kind, level_cm, photo_path, driver_present, taken_at")
+      .select("kind, level_cm, repeat_level_cm, photo_path, driver_present, taken_at")
       .eq("delivery_id", id),
     supabase
       .from(TABLES.shares)

@@ -17,6 +17,8 @@ export type SummaryInput = {
   measuredLiters: number | null;
   verdict: Verdict;
   toleranceLiters: number;
+  // "Entraron unos X L menos…, dentro del margen…" when it applies (insideMarginNote)
+  insideMarginNote?: string | null;
   before: SummaryReading;
   after: SummaryReading;
   driverPresent: boolean;
@@ -73,6 +75,7 @@ export function buildSummary(s: SummaryInput): string {
       s.measuredLiters === null ? "no se pudo medir" : formatLiters(s.measuredLiters)
     }`,
     verdictLine,
+    s.verdict === "consistent" ? (s.insideMarginNote ?? null) : null,
     readingLine("antes", s.before, s.driverPresent ? "con el pipero presente" : "sin el pipero"),
     readingLine("después", s.after),
     "",

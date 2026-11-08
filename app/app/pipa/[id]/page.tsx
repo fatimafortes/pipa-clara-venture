@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getDelivery, type DeliveryDetail } from "@/lib/data";
-import { formatDay, formatLiters, formatMxn, formatTime } from "@/lib/format";
+import { formatDay, formatLiters, formatMxn, formatNumber, formatTime } from "@/lib/format";
 import { buildSummary, whatsappLink } from "@/lib/summary";
-import { computeVerdict } from "@/lib/verdict";
+import { computeVerdict, insideMarginNote, precisionNote } from "@/lib/verdict";
 import { setSharePaid } from "../actions";
 import { valueOfMeasured } from "@/lib/shares";
 import { ChallengeForm } from "./ChallengeForm";
@@ -50,6 +50,8 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
     widthM: Number(cistern.width_m),
     maxHeightCm: Number(cistern.max_height_cm),
     beforeCm: before ? Number(before.level_cm) : null,
+    // Without it the margin on screen wouldn't match the saved verdict
+    beforeRepeatCm: before?.repeat_level_cm == null ? null : Number(before.repeat_level_cm),
     afterCm: after ? Number(after.level_cm) : null,
     litersClaimed: delivery.liters_claimed,
     pumpRan: delivery.pump_ran,
@@ -64,6 +66,9 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
         ? "Consistente"
         : "No se pudo medir";
   const style = cardStyle[delivery.verdict];
+  // Below the claim but inside the margin: say so instead of "entraron los litros que dijo"
+  const insideNote = delivery.verdict === "consistent" ? insideMarginNote(explained, delivery.liters_claimed) : null;
+  const range = measured === null ? null : explained.measuredRange;
 
   const amounts = shares.map((s) => s.amount_mxn);
   const low = Math.min(...amounts);
@@ -81,6 +86,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
     measuredLiters: measured,
     verdict: delivery.verdict,
     toleranceLiters: explained.toleranceLiters,
+    insideMarginNote: insideNote,
     before: before ? { takenAt: before.taken_at, hasPhoto: Boolean(before.photo_path) } : null,
     after: after ? { takenAt: after.taken_at, hasPhoto: Boolean(after.photo_path) } : null,
     driverPresent: before?.driver_present ?? false,
@@ -118,7 +124,14 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
             // Said in words, so an empty value never looks like a broken screen
             <dd className="text-right text-lg font-semibold text-muted">— (no se pudo medir)</dd>
           ) : (
-            <dd className="text-2xl font-bold">{formatLiters(measured)}</dd>
+            <dd className="text-right">
+              <span className="block text-2xl font-bold">{formatLiters(measured)}</span>
+              {range && (
+                <span className="block text-base text-muted">
+                  entre {formatNumber(range.low)} y {formatLiters(range.high)}
+                </span>
+              )}
+            </dd>
           )}
         </div>
       </dl>
@@ -126,7 +139,13 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
       <section className={`space-y-3 rounded-2xl border-2 p-5 ${style.box}`}>
         <p className={`text-sm font-bold tracking-widest ${style.text}`}>VEREDICTO</p>
         <p className={`text-3xl font-bold ${style.text}`}>{title}</p>
-        <p className="text-lg leading-relaxed">{explained.reason}</p>
+        <p className="text-lg leading-relaxed">{insideNote ?? explained.reason}</p>
+        {/* How precise this measurement was; meaningless when it couldn't be measured */}
+        {measured !== null && (
+          <p className="rounded-xl bg-page px-4 py-3 text-base leading-relaxed text-muted">
+            {precisionNote(explained)}
+          </p>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <ReadingThumb
             label="Antes"

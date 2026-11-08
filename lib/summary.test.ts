@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildSummary, whatsappLink, type SummaryInput } from "./summary";
+import { computeVerdict, insideMarginNote } from "./verdict";
 
 // The mockup example: 12 households, 7 paid, 1,300 L short, full price paid
 const mockup: SummaryInput = {
@@ -88,6 +89,56 @@ describe("buildSummary", () => {
     expect(text).toContain("NO SE PUDO MEDIR");
     expect(text).not.toContain("FALTANTE");
     expect(text).not.toContain("Lectura de después");
+  });
+});
+
+// Week 13 mockup: 3 × 2.5 m, before read twice (41 and 42 cm), after 173 cm → 9,900 of 10,000 L
+const week13Verdict = computeVerdict({
+  lengthM: 3, widthM: 2.5, maxHeightCm: 300, beforeCm: 41, beforeRepeatCm: 42, afterCm: 173,
+  litersClaimed: 10_000, pumpRan: false, overflowed: false,
+});
+const week13: SummaryInput = {
+  ...mockup,
+  measuredLiters: week13Verdict.measuredLiters,
+  verdict: week13Verdict.verdict,
+  toleranceLiters: week13Verdict.toleranceLiters,
+  insideMarginNote: insideMarginNote(week13Verdict, 10_000),
+};
+
+describe("buildSummary with the Week 13 precision check", () => {
+  it("consistent below the claim: the margin from the repeat (150 L) and the 'unos X L menos' sentence", () => {
+    const text = buildSummary(week13);
+    expect(text).toContain("Veredicto: CONSISTENTE (margen de medición de 150 litros)");
+    expect(text).toContain(
+      "Entraron unos 100 L menos de lo que dijo el pipero, dentro del margen de medición de 150 litros.",
+    );
+  });
+
+  it("no sentence when there is nothing to say (measured once, at the claim)", () => {
+    const text = buildSummary({ ...mockup, verdict: "consistent", measuredLiters: 10_000 });
+    expect(text).not.toContain("menos de lo que dijo");
+  });
+
+  it("the sentence never appears on a short or couldn't-measure verdict, even if passed", () => {
+    for (const verdict of ["short", "couldnt_measure"] as const) {
+      expect(buildSummary({ ...week13, verdict })).not.toContain("dentro del margen de medición de 150 litros.");
+    }
+  });
+
+  it("still never contains household labels", () => {
+    const text = buildSummary(week13);
+    for (const label of ["Depto", "Hogar", "Casa"]) expect(text).not.toContain(label);
+  });
+
+  it("never accuses: no 'robo', 'robó' or 'te robaron', for any verdict", () => {
+    for (const input of [
+      mockup,
+      week13,
+      { ...mockup, verdict: "couldnt_measure" as const, measuredLiters: null },
+      { ...mockup, paidMxn: 1_566 },
+    ]) {
+      expect(buildSummary(input)).not.toMatch(/rob[oó]|te robaron/i);
+    }
   });
 });
 

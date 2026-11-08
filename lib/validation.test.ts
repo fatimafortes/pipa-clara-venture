@@ -101,6 +101,23 @@ describe("validateDelivery (PACKET §13 form cases)", () => {
     expect(validateDelivery({ ...delivery, priceMxn: "0" }, 200).ok).toBe(false);
   });
 
+  it("the second 'before' reading is optional: empty → null", () => {
+    const result = validateDelivery({ ...delivery, beforeRepeatCm: " " }, 200);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.beforeRepeatCm).toBeNull();
+  });
+
+  it("the second 'before' reading follows the same rule as the other levels", () => {
+    const ok = validateDelivery({ ...delivery, beforeRepeatCm: "41,5" }, 200);
+    expect(ok.ok).toBe(true);
+    if (ok.ok) expect(ok.value.beforeRepeatCm).toBe(41.5);
+    for (const bad of ["-1", "201", "cuarenta"]) {
+      const result = validateDelivery({ ...delivery, beforeRepeatCm: bad }, 200);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.errors.beforeRepeatCm).toContain("entre 0 y 200 cm");
+    }
+  });
+
   it("an empty 'after' level is allowed: the verdict will be 'couldn't measure'", () => {
     const result = validateDelivery({ ...delivery, afterCm: "" }, 200);
     expect(result.ok).toBe(true);

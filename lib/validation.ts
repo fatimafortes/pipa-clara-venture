@@ -82,6 +82,8 @@ export type DeliveryInput = {
   priceMxn: string;
   feeMxn: string;
   beforeCm: string;
+  // Optional precision check: the same "before" level read a second time
+  beforeRepeatCm?: string;
   afterCm: string;
   pumpRan: boolean;
   overflowed: boolean;
@@ -92,6 +94,8 @@ export type Delivery = {
   priceMxn: number;
   feeMxn: number;
   beforeCm: number;
+  // null when she measured only once (the margin then uses 2 cm per reading)
+  beforeRepeatCm: number | null;
   // null when the "after" level was left empty: the verdict will be "couldn't measure"
   afterCm: number | null;
   pumpRan: boolean;
@@ -111,6 +115,11 @@ export function validateDelivery(input: DeliveryInput, maxHeightCm: number): Res
   const levelMessage = `El nivel debe ser un número entre 0 y ${maxHeightCm} cm (la altura máxima de tu cisterna).`;
   const beforeCm = checkRange(errors, "beforeCm", input.beforeCm, 0, maxHeightCm, levelMessage);
 
+  let beforeRepeatCm: number | null = null;
+  if ((input.beforeRepeatCm ?? "").trim() !== "") {
+    beforeRepeatCm = checkRange(errors, "beforeRepeatCm", input.beforeRepeatCm ?? "", 0, maxHeightCm, levelMessage);
+  }
+
   let afterCm: number | null = null;
   if (input.afterCm.trim() !== "") {
     afterCm = checkRange(errors, "afterCm", input.afterCm, 0, maxHeightCm, levelMessage);
@@ -124,6 +133,7 @@ export function validateDelivery(input: DeliveryInput, maxHeightCm: number): Res
       priceMxn,
       feeMxn,
       beforeCm,
+      beforeRepeatCm,
       afterCm,
       pumpRan: input.pumpRan,
       overflowed: input.overflowed,
