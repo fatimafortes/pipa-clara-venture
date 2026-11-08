@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { logDeliveryEvent } from "../actions";
+import { logAppOpened, logDeliveryEvent } from "../actions";
+
+// app_opened once per opening of /app (same reason and pattern as verdict_viewed)
+export function LogAppOpened() {
+  const logged = useRef(false);
+  useEffect(() => {
+    if (logged.current) return;
+    logged.current = true;
+    void logAppOpened();
+  }, []);
+  return null;
+}
 
 // verdict_viewed once per opening of the page. Logged from the browser, not the server
 // render, because a payment tap re-renders the page (refresh()) and that isn't a new view.

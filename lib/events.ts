@@ -7,6 +7,8 @@ import { retryOnFutureToken } from "./supabase/retry";
 // Same fixed list as the CHECK constraint on pc_events
 export type EventName =
   | "signed_in"
+  // Opening /app: a returning organizer is usually still signed in, so this is the visit
+  | "app_opened"
   | "cistern_created"
   | "delivery_saved"
   | "verdict_viewed"

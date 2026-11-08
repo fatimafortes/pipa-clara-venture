@@ -3,7 +3,7 @@
 -- Runs in the SQL editor by impersonating each account (role + JWT "sub"), like f3-rls-test.sql.
 -- Everything it creates is rolled back at the end: it leaves NO data behind.
 --
--- Before running: the Week 13 migration has run, and both accounts have signed in once.
+-- Before running: both Week 13 migrations have run, and both accounts have signed in once.
 -- Edit ONLY the two emails on the lines marked "<-- EDIT".
 
 create temp table if not exists pc_rls_results (
@@ -69,9 +69,19 @@ begin
     expected := array_append(expected, 'permitido');
     actual := array_append(actual, outcome);
 
+    begin
+      insert into public.pc_events (name) values ('app_opened');
+      outcome := 'permitido';
+    exception when others then
+      outcome := case when sqlstate = '42501' then 'bloqueado' else 'error: ' || sqlerrm end;
+    end;
+    names := array_append(names, 'A registra que abrió la app (app_opened)');
+    expected := array_append(expected, 'permitido');
+    actual := array_append(actual, outcome);
+
     select count(*) into n from public.pc_events where organizer_id = uid_a and created_at >= now();
     names := array_append(names, 'A ve sus propios eventos (de esta prueba)');
-    expected := array_append(expected, '2');
+    expected := array_append(expected, '3');
     actual := array_append(actual, n::text);
 
     begin

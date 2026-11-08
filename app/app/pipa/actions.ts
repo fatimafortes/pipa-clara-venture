@@ -218,6 +218,11 @@ export async function logDeliveryEvent(name: "verdict_viewed" | "summary_sent", 
   await logEvent(name, deliveryId);
 }
 
+// Called from /app in the browser when it opens: the visit, even without a new sign-in
+export async function logAppOpened() {
+  await logEvent("app_opened");
+}
+
 export type DriverPaymentState = { errors: FieldErrors; values: Record<string, string> };
 
 // "¿Cuánto le pagaste al pipero?" (persona-test fix): the app labels, the organizer decides.

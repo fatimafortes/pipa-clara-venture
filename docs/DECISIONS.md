@@ -323,3 +323,29 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Tests: 74 passing** (+13 engine incl. all PACKET §13 cases, +2 validation, +5 summary). Types, lint, build OK.
 - **Deploy order: the Week 13 migration must run in "semestre" before this push**, or every pipa page fails with `42703`. Done: it ran and was confirmed from outside (see W3).
 - **Two commits from one working tree:** W3 and W4+W5 touched the same three files, so the W3 commit was staged from W3-only copies and **built on its own** before committing (types, lint, 54 tests, build). **Slip on my side, no loss:** setting W4+W5 aside with `git stash` for that build conflicted on `DECISIONS.md` when restored (my W3-only copy had one extra blank line). Git kept the stash; I restored every file from it, checked them byte for byte, restaged and dropped the stash only after the W3 commit. The full tree was re-checked afterwards: types, lint, 74 tests, build.
+- **W3 and W4+W5 accepted (2026-11-08), founder's phone test on production with a new account, 3 × 2.5 m cistern:**
+  - Pipa 1 (before 41, repeat 42, after 173): **Consistente, 9,900 L, the range, "unos 100 L menos … 150 litros" and the grey box.** ✔
+  - Pipa 2 (no repeat): **300 litros** margin and "Medida una vez". ✔
+  - WhatsApp summary: the right margin, the "unos 100 L menos" line, no names. ✔
+  - Payment buttons only toggle pendiente/pagado; **`pc_events` shows one row per action, and payments added none** (the client-side `verdict_viewed` decision works). ✔
+  - **Not yet checked: an old (Week 12) pipa looks the same.** A new account has none; moved to W6.
+
+### W6 — Mechanical pass and production check
+- **Production, from outside (2026-11-08, after `af1d0e3`):** `/`, `/product`, `/about`, `/login`, `/privacidad` → 200; `/app`, `/app/pipa/nueva` without a session → 307 to `/login`; `pipa-clara.site` and `http://` → 308 to `https://www.pipa-clara.site`. Same as Week 12.
+- **Security floor, from outside:** all six `pc_` tables, anonymous read → 401; **`pc_events` anonymous read and insert → 401 / `42501`**; bucket anonymous list → `[]`, public URL → 400. **Secrets:** no service-role/secret key in tracked files or git history (only the warning comment in `.env.example`, the only env file ever committed); the browser JS of the public pages (10 files, ~840 KB) contains only `NEXT_PUBLIC_SUPABASE_URL` and the publishable key, no JWTs; the one `sb_secret_` match is supabase-js checking a key's prefix (same as Week 12).
+- **PACKET §13 mechanical list:**
+  - `computeVerdict()` cases (no repeat = Week 12, spread 0 → 1 cm floor, spread 3 cm → triple, 80 L below inside the margin, couldn't-measure → no liters): unit tests ✔ (74 passing).
+  - Event log: one row per action ✔ (founder's phone, W3/W4 acceptance); B can't read A's events ✔ and an unknown name is rejected ✔ (`w13-events-rls-test.sql` 13/13 in "semestre").
+  - `PGRST303` retried once, then succeeds: unit tests ✔ (W1).
+  - Sign-in with a Google account that was never a test user ✔ (W2).
+  - Old (Week 12) pipa looks the same: **pending, founder.**
+- **Bug found (W6): the return signal misses most returns.** `signed_in` is written only by `/auth/callback`, i.e. only when someone goes through the Google screen. Supabase sessions don't expire by default and `proxy.ts` keeps refreshing them, so **a tester who comes back days later on the same phone is already signed in and logs no `signed_in`**; marking payments days later logs nothing at all. `w13-return-signal.sql` would say "regresó: no" about exactly the person who came back: a false negative on Blueprint condition 4, the week's key evidence. My W3 design missed it; the founder's tests couldn't show it (every test started with a fresh sign-in).
+- **Fix (founder's choice among three options): new event `app_opened`.** Rejected: reusing `signed_in` once a day (no migration, but the name would no longer mean "went through Google" in her evidence), and changing only the query (a return that only opens `/app` or marks payments would still leave nothing).
+  - Migration `supabase/migrations/20261108150000_pc_events_app_opened.sql`: replaces only `pc_events_name_check` with the same list plus `'app_opened'`. Uses the exact constraint name, so a different name fails and changes nothing.
+  - `/app` logs `app_opened` once per opening from the browser (`LogAppOpened`, same pattern and reason as `verdict_viewed`); it never blocks the page. After a Google sign-in both `signed_in` and `app_opened` are written; that is expected.
+  - **This changes PACKET A1's fixed list of six names to seven.** Logged as a needed deviation: without it, A1's purpose ("a return visit is visible without asking anyone") fails. The privacy page already covers it ("cuándo entras").
+  - `w13-return-signal.sql` now counts **days with any event** (`dias_con_visita`, "regresó: sí" at 2+), and keeps `dias_con_entrada_google` apart.
+  - `w13-events-rls-test.sql`: +1 check (`app_opened` accepted) → 14 checks.
+  - Verified in PGlite: the four migrations in order; `f3-rls-test.sql` 14/14; `w13-events-rls-test.sql` 14/14 (an unknown name is still rejected after the swap); 0 rows left. An organizer who signed in through Google once and came back already signed in on two more days → **3 days, 1 Google sign-in, regresó: sí** (the old query said "no"). Types, lint, 74 tests, build OK.
+  - **Deploy order:** the migration must run before the push. The code wouldn't break without it, but every `app_opened` would be rejected and the visits lost.
+  - **Migration run by the founder in "semestre" (2026-11-08): "Success".** From outside, `pc_events` is still locked (anonymous read and insert of `app_opened` → `401 / 42501`). The CHECK itself can't be seen from outside (visitors are refused before it applies), so **the proof that `app_opened` is accepted is pending:** `app_opened` rows after the deploy, and `w13-events-rls-test.sql` 14/14 with both accounts.

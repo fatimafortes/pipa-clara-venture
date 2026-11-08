@@ -6,6 +6,7 @@ import { formatDay, formatLiters } from "@/lib/format";
 import { litersPerCm } from "@/lib/verdict";
 import { signOut } from "./actions";
 import { CisternForm } from "./CisternForm";
+import { LogAppOpened } from "./pipa/[id]/EventLoggers";
 
 export const metadata: Metadata = {
   title: "Mi cisterna",
@@ -32,6 +33,7 @@ async function OrganizerHome() {
 
   return (
     <div className="space-y-6">
+      <LogAppOpened />
       {cistern && (
         <>
           <Link
