@@ -407,7 +407,11 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   - **Promoted `f0d4386` back** (`vercel promote`, `pipa-clara-venture-8y7644z8j…`, `dpl_Dg8C8W7p…`); confirmed from outside the same way. While it was rolled back, nothing was pushed (a rollback pauses automatic production deploys; promoting turns them back on).
   - **Real data:** the "before" run marked Hogar 2 as paid in the shared database; she set it back to pending before the "after" run.
 - **After (founder's phone, `f0d4386`):** screenshots A′, B′, C′ of the new layout; **"Ver pagos" lands on "¿Quién ya te pagó?" and the list buttons land where they should** (the `ScrollToHash` jump works in production). Same timed task, done by her.
-- **Times: not recorded in this log.** All three of the founder's messages with the times said "[N] seconds" (before "[N] seconds approx.", after "[N] seconds"). I didn't invent numbers: **a before/after without the numbers is not yet evidence.** Add them here when available.
+- **Times for the same task (from `/app`, mark one household paid and open the WhatsApp summary), both done by the founder, not a tester:**
+  - **Before (`e227786`): more than 60 s**, the founder's words "+60 seconds". **Estimated from memory, not timed.**
+  - **After (`da0e62d`): about 30 s**, timed with a stopwatch, marking **Hogar 3** (Hogar 2 was used in the "before" run; same task, different household).
+  - **Honest reading:** roughly half the time or better, but the "before" side is an estimate and the person doing it already knew the app. **It's a rough comparison, not a measurement.** The stronger evidence for the fix is behavioral: the returning user could not find the summary, and now both actions are on the `/app` list. Next real sessions: time a tester on the same task.
+  - (Earlier messages had "[N]" / "XX" in place of the numbers; I left the times out until the founder gave them.)
 - **Founder's finding from the "after" check, fixed:** the list button said **"Mandar resumen"** but only opens the pipa at the WhatsApp button; it sends nothing. **Renamed "Ver resumen"**, same place it lands. Rule: **the only button that says "Mandar" is the one that opens WhatsApp.** Checked: it's now the only "Mandar" on screen.
 - Checked: types, lint, 74 tests, build.
 
