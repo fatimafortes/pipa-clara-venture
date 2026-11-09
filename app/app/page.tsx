@@ -75,7 +75,8 @@ async function OrganizerHome() {
                         href={`/app/pipa/${d.id}#resumen`}
                         className="rounded-xl bg-whatsapp px-3 py-3 text-center text-lg font-semibold text-white"
                       >
-                        Mandar resumen
+                        {/* Only opens the pipa at the WhatsApp button; "Mandar" is reserved for that button */}
+                        Ver resumen
                       </Link>
                     </div>
                   </li>

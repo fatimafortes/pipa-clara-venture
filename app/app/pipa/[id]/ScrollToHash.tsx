@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-// "Ver pagos" / "Mandar resumen" on /app link to #pagos / #resumen. The verdict streams in
+// "Ver pagos" / "Ver resumen" on /app link to #pagos / #resumen. The verdict streams in
 // behind Suspense, so the browser's own jump can happen before that part exists; this
 // mounts with it and scrolls once it's there.
 export function ScrollToHash() {
