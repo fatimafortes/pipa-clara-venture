@@ -388,6 +388,23 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
   - **After:** an open teal box "¿Cómo mido?" (what / where / when) under the "Nueva pipa" title on the first pipa, and an open box "¿Cómo mido mi cisterna?" right above the dimensions. Screenshots on the founder's phone (I can't sign in to take them).
 - Checked: types, lint, 74 tests, build; no "robo / robó / te robaron".
 
+### W7 — The #1 pain fix (Slice B), from the five real sessions
+
+- **Addendum first, committed alone** (`b217d77`, `docs: packet addendum, #1 pain from real users`) as `## 15. Addendum: the #1 pain from real users` in `docs/PACKET.md`, before Appendix A. **Not "## 14." as the build prompt said:** the packet already has a §14 ("Blueprint conditions honored"); founder's choice. It holds: the five sessions (roles only), **strangers = sessions 1, 2, 4 and 5 (4 of 5)**, session 3 known to the founder; the relatives' unobserved use; the water-meter finding; the return signal; the pain ranking; the fix.
+- **Pushback given before building, per the build prompt's W7 rule:**
+  - The first fix description only moved "Pagos"; it **missed the half of #1 the sessions revealed** (the returning user couldn't get back to the WhatsApp summary). The founder's complete fix covers both halves.
+  - Moving payments up was knowable before the sessions (a Week 12 question). Recorded in the addendum: the sessions changed *why* (for the 3 who organize or pay, collecting is the job), and the way back to the summary is the part that couldn't have been predicted.
+  - **A finding that may contradict the premise, "3 of 5 already have a water meter on their cistern", was missing from the ranking.** Now in the addendum, with where the meter sits (city line vs. where the pipa unloads) marked as unknown, to ask next time. The fix doesn't address it.
+  - **The return signal came from a relative, not an observed stranger.** Recorded as a weaker kind of independence.
+- **The fix (founder's spec), no new data, no migration:**
+  - **Verdict page:** the payments section moved from the bottom (under the challenges) to **right under "Cada hogar paga"**, with the heading **"¿Quién ya te pagó?"** and **"Toca cada hogar cuando te pague."** The privacy line stays. **"Ya pagaron: X de N" is now a link to `#pagos`.** The WhatsApp button follows the payments, in `#resumen`.
+  - **`/app` list:** each pipa keeps its row (date, "Ya pagaron", verdict) and gains two buttons: **"Ver pagos"** (→ `#pagos`) and **"Mandar resumen"** (→ `#resumen`, the green WhatsApp button).
+  - **Decision: "Mandar resumen" jumps to the WhatsApp button; it doesn't open WhatsApp from the list.** Opening it directly would mean building every pipa's full summary (readings, shares, challenges) on the list page: more queries, not the smallest fix. Cost: one more tap. The returning user's problem was getting lost, not the tap.
+  - **`ScrollToHash`** (tiny client component): the verdict streams in behind Suspense, so the browser's own jump to `#pagos` can happen before that part exists (the Week 12 `#pagos` lesson); it scrolls once the content is mounted. It also helps the existing `#desacuerdos` redirect after a challenge.
+- **Before (production, before the push), captured by the founder:** screenshot A (verdict on open: no payments in view; "Ya pagaron" a plain label), B (payments at the very bottom, under the challenges), C (`/app` list: one row per pipa, no actions). **Timed task**, done by the founder (not a tester), from `/app` "a day later": mark that Depto 2 paid and send the WhatsApp summary: **⚠ time pending, the founder's message said "[N] seconds"**.
+- **After:** same screenshots and the same timed task after the deploy, below.
+- Checked: types, lint, 74 tests, build.
+
 ## Tomorrow's first move (Week 13, sessions)
 
 - **Run the five real-user sessions** (at least three strangers) at `www.pipa-clara.site`, one sheet each (PACKET §13): role and where found, stranger yes/no, story, tasks A–D with times, **the spread of the two "before" readings in cm**, 2–3 exact quotes, commitment. Consent first; roles, never names.

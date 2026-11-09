@@ -48,10 +48,10 @@ async function OrganizerHome() {
               <h2 className="text-xl font-bold">Pipas registradas</h2>
               <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
                 {deliveries.map((d) => (
-                  <li key={d.id}>
+                  <li key={d.id} className="space-y-3 px-5 py-4">
                     <Link
                       href={`/app/pipa/${d.id}`}
-                      className="flex items-center justify-between gap-3 px-5 py-4 text-lg"
+                      className="flex items-center justify-between gap-3 text-lg"
                     >
                       <span>
                         Pipa del {formatDay(d.delivered_at)}
@@ -63,6 +63,21 @@ async function OrganizerHome() {
                         {verdictLabel[d.verdict]} →
                       </span>
                     </Link>
+                    {/* What the organizer comes back for (real sessions, W7): collect and tell the neighbors */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link
+                        href={`/app/pipa/${d.id}#pagos`}
+                        className="rounded-xl border-2 border-teal bg-white px-3 py-3 text-center text-lg font-semibold text-teal"
+                      >
+                        Ver pagos
+                      </Link>
+                      <Link
+                        href={`/app/pipa/${d.id}#resumen`}
+                        className="rounded-xl bg-whatsapp px-3 py-3 text-center text-lg font-semibold text-white"
+                      >
+                        Mandar resumen
+                      </Link>
+                    </div>
                   </li>
                 ))}
               </ul>

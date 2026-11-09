@@ -11,6 +11,7 @@ import { valueOfMeasured } from "@/lib/shares";
 import { ChallengeForm } from "./ChallengeForm";
 import { DriverPaymentForm } from "./DriverPaymentForm";
 import { LogVerdictViewed, SummaryButton } from "./EventLoggers";
+import { ScrollToHash } from "./ScrollToHash";
 import { PaidButton } from "./PaidButton";
 
 export const metadata: Metadata = {
@@ -101,6 +102,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
   return (
     <div className="space-y-5">
       <LogVerdictViewed deliveryId={delivery.id} />
+      <ScrollToHash />
       <Link href="/app" className="inline-block py-1 text-lg font-medium text-teal">
         ← Mi cisterna
       </Link>
@@ -174,9 +176,12 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
               {low === high ? formatMxn(low) : `${formatMxn(low)} o ${formatMxn(high)}`}
             </span>
           </p>
-          <span className="rounded-full bg-teal-soft px-4 py-2 text-lg font-semibold text-teal">
+          <a
+            href="#pagos"
+            className="rounded-full bg-teal-soft px-4 py-2 text-lg font-semibold text-teal underline"
+          >
             Ya pagaron: {paid} de {shares.length}
-          </span>
+          </a>
         </div>
         <p className="text-base text-muted">
           {paidToDriver < delivery.price_mxn
@@ -187,31 +192,11 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
         </p>
       </section>
 
-      <SummaryButton href={whatsappLink(summary)} deliveryId={delivery.id} />
-      <ChallengeForm key={challenges.length} deliveryId={delivery.id} />
-      <p className="text-center text-base text-muted">
-        El veredicto es evidencia, no sentencia. Cualquier desacuerdo queda guardado junto a él.
-      </p>
-
-      {challenges.length > 0 && (
-        <section id="desacuerdos" className="space-y-3">
-          <h2 className="text-xl font-bold">Desacuerdos</h2>
-          <ul className="space-y-3">
-            {challenges.map((c) => (
-              <li key={c.id} className="rounded-xl border-l-4 border-amber bg-white p-4">
-                <p className="text-base font-semibold text-muted">
-                  {raisedByLabel[c.raised_by]} · {formatDay(c.created_at)}, {formatTime(c.created_at)}
-                </p>
-                <p className="whitespace-pre-wrap text-lg">{c.note}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section id="pagos" className="space-y-3">
+      {/* Right under "Cada hogar paga" (real sessions, W7): collecting is the organizer's next job */}
+      <section id="pagos" className="scroll-mt-4 space-y-3">
         <div>
-          <h2 className="text-xl font-bold">Pagos</h2>
+          <h2 className="text-2xl font-bold">¿Quién ya te pagó?</h2>
+          <p className="text-lg">Toca cada hogar cuando te pague.</p>
           <p className="text-base text-muted">
             Solo tú ves quién ya pagó. Los vecinos solo ven &quot;Ya pagaron: {paid} de {shares.length}&quot;.
           </p>
@@ -238,6 +223,31 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
           ))}
         </ul>
       </section>
+
+      <div id="resumen" className="scroll-mt-4">
+        <SummaryButton href={whatsappLink(summary)} deliveryId={delivery.id} />
+      </div>
+      <ChallengeForm key={challenges.length} deliveryId={delivery.id} />
+      <p className="text-center text-base text-muted">
+        El veredicto es evidencia, no sentencia. Cualquier desacuerdo queda guardado junto a él.
+      </p>
+
+      {challenges.length > 0 && (
+        <section id="desacuerdos" className="space-y-3">
+          <h2 className="text-xl font-bold">Desacuerdos</h2>
+          <ul className="space-y-3">
+            {challenges.map((c) => (
+              <li key={c.id} className="rounded-xl border-l-4 border-amber bg-white p-4">
+                <p className="text-base font-semibold text-muted">
+                  {raisedByLabel[c.raised_by]} · {formatDay(c.created_at)}, {formatTime(c.created_at)}
+                </p>
+                <p className="whitespace-pre-wrap text-lg">{c.note}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
     </div>
   );
 }
