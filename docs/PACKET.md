@@ -193,6 +193,48 @@ Same stack as Week 12; only additions are listed.
 
 ---
 
+## 15. Addendum: the #1 pain from real users
+
+*Written after the five real-user sessions and before the Slice B code (PACKET §6, B1). Roles only, never names. Quotes as recorded in the founder's session notes.*
+
+### Sessions
+
+**Strangers: sessions 1, 2, 4 and 5 (4 of 5).** Session 3 (the father) is someone I knew. Blueprint condition 1 (at least 3 of 5) is met.
+
+| # | Role (stranger?) | Worse: short pipa or a neighbor who doesn't pay? | Struggle (what they did) | Quote |
+|---|---|---|---|---|
+| 1 | Woman who organizes the pipas · stranger | **A neighbor who doesn't pay**: "I end up putting in the money and then I have to collect." | Couldn't find where to record each neighbor's payment. | "Esto me serviría para no tener que estar anotando todo en mi libreta." |
+| 2 | Building security guard (doesn't pay; the administrator does) · stranger | Short pipa ("everyone comes to complain to me") | Needed help to find where to register the cistern; over 60 s on each step. | "Si usted no me explica no entendería nada, señorita." |
+| 3 | Father, building with administration · known to me | Short pipa | Didn't know whether to enter the liters ordered or the liters received. Asked how much each apartment pays. | "Tendría que utilizarlo el administrador." |
+| 4 | Young neighbor · stranger | **A neighbor who doesn't pay** (one always pays late) | Couldn't find how to attach the photo. | — |
+| 5 | Neighbor, 20,000 L pipas, two suppliers · stranger | **A neighbor who doesn't pay** | Looked for a delivery history per supplier. | "Siempre acaba en discusión." |
+
+**Unobserved use:** two of my relatives used the link alone, without me. They said it was hard, and they couldn't find the photo upload.
+
+**Finding that may challenge the premise:** 3 of 5 already have a water meter on their cistern. Not recorded: whether the meter is on the city supply line (it doesn't measure the pipa) or where the pipa unloads (then the liters may not be in dispute for them). To ask in the next sessions; not addressed by this fix.
+
+### Return signal (Blueprint condition 4)
+
+One of the two relatives who used the link on her own (not one of the five observed sessions) **came back to the app later to send the WhatsApp summary.** After leaving, she couldn't find her way back to it, and she **messaged me a screenshot on her own initiative** (kept, with her name hidden). Honest limit: she is a relative, not a stranger, so this is a weaker kind of independence than a stranger coming back. It is also evidence for the #1 pain: she came back for the summary and couldn't find it.
+
+### Pain ranking (severity, frequency, behavior, threat to the 10:1 case)
+
+1. **What the organizer needs after the verdict can't be found.** Marking who paid is at the bottom of the verdict page, and the returning user couldn't get back to the WhatsApp summary. **The 3 people who organize or pay ranked "a neighbor who doesn't pay" as worse, which contradicts my written prediction that measurement was the main value.**
+2. **First steps unclear:** what to fill first; "litros que dijo el pipero" read as liters ordered vs. received.
+3. **Photo upload not found** (session 4 and both relatives).
+
+**Warning-sign check (§13):** moving payments up is something I could have done before the sessions. What the sessions changed is *why*: for the people who pay, collecting is the job, not a detail under the verdict. The fix also covers the half I could not have predicted: the way back to the summary for someone who returns.
+
+### The fix (B1), smallest
+
+- On the verdict page, move "Pagos" right under "Cada hogar paga", with the heading **"¿Quién ya te pagó?"** and the instruction **"Toca cada hogar cuando te pague"**.
+- Make **"Ya pagaron: X de N"** a link that jumps there.
+- On the `/app` list, each pipa shows two clear actions: **"Ver pagos"** and **"Mandar resumen"**.
+- No new data, no migration.
+- **Before/after evidence:** screenshots of the verdict page and the `/app` list, plus the same task timed before and after ("you're back a day later: mark that Depto 2 paid and send the summary").
+
+---
+
 ## Appendix A: mockup screen description
 
 > Mobile screen, Spanish UI, app "Pipa Clara" (water-drop logo, teal and white), badge "DATOS DE EJEMPLO". Title "Pipa del 6 de noviembre". Rows: "Litros que dijo el pipero: 10,000 L" and "Litros que entraron (medidos): 9,900 L · entre 9,750 y 10,050 L". Teal verdict card: "Consistente" and below, smaller: "Entraron unos 100 L menos de lo que dijo el pipero, dentro del margen de medición de 150 litros." A small grey box: "Precisión de tu medición: medida dos veces, diferencia de 1 cm". Two photo thumbnails: "Antes · 08:02 · 41 cm, con el pipero presente" and "Después · 08:41 · 173 cm". Then "Cada hogar paga: $152", "Ya pagaron: 0 de 12", green button "Mandar resumen por WhatsApp", outlined "Registrar desacuerdo". Large readable text for a 55-year-old, flat, no clutter.
