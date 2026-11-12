@@ -422,3 +422,40 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 - **Kill-condition check:** if most spreads are ≥ 3 cm, the margin is hiding short loads; say it in the pain ranking, and consider bringing back the cut ≥ 3 cm warning.
 - **Return signal:** run `supabase/checks/w13-return-signal.sql` a few days after the sessions; a tester counts as back at `dias_con_visita` ≥ 2.
 - **Then W7:** write `## 14. Addendum` in `docs/PACKET.md` (the user quote + the pain ranking), commit `docs: packet addendum, #1 pain from real users`, and only then build the smallest fix, with before/after screenshot and timing.
+
+---
+
+# Week 14 — Pricing
+
+Packet first (`8527b12`, `docs/PACKET.md`; Week 13 packet moved to `docs/PACKET-13.md`), then the implementation prompt (`docs/implementation-prompt-week14.md`), then code.
+
+## Decisions (founder's)
+
+- **Families: $10 per delivery, from the first pipa.** No free tier for measuring: a near-zero price reads as no value (this week's provocation), and my Week 13 $2-per-household was the politeness price my Brain Bending fight killed. The fee is added to the pipa cost and split in the same shares; everyone sees the total before committing.
+- **Free-vs-paid line:** whoever uses the measurement pays (the organizer's group, the business); whoever only reads the result (neighbors receiving the WhatsApp summary) never pays.
+- **Negocios: price = value of one measured delivery ÷ 10.** With today's analogy that is about $2; it is recalculated after the first 10 measured business deliveries. "The data sets the price" is the rule, not "monetization later".
+- **The fee never passes through the pipero.** The organizer keeps it aside; the monthly transfer to Pipa Clara is **not active in the pilot** (said on `/pricing`).
+- **One source of numbers:** `lib/pricing.ts` feeds `/pricing`, the simulator and the `/about` memo (Week 14 clarification: same assumptions everywhere). Each assumption is tagged medido / supuesto / analogía.
+
+## What the numbers say (honest)
+
+- Families: **7.2 to 1** at the defaults (5.3 to 9.2 if collecting takes 1–2 h), **2 to 1 per household**. Not 10 to 1 yet; said on the page.
+- With a 3 × 2.5 m cistern at 2 cm per reading, the margin is 300 L: **a 1.1% shortfall (110 L) can't be detected.** The measurement only sees shortfalls above 3%; at 3% the case reaches 10.7 to 1. That makes the first measured deliveries the most important number of the venture.
+
+## Deviations from the packet
+
+- Saved scenarios live in `localStorage` + a shareable URL, not Supabase: no personal data, so no auth or RLS needed (security floor).
+- The delivery form still stores the fee **per household** (no migration); its default is `max(1, round(10 / households))`, about $10 per delivery.
+- Built locally with the Google font stubbed (the build sandbox can't reach fonts.googleapis.com); the stub was never committed. Vercel builds with the real font.
+
+## Mechanical pass
+
+- Tests: 89 pass (14 new in `lib/pricing.test.ts`), lint clean, build OK.
+- Phone width 375 px: `/pricing` and `/about` have no horizontal scroll; saving a scenario survives reload; a shared link restores the scenario in a fresh browser; Negocios tab loads its own defaults.
+- **Bug found and fixed:** money with cents showed as "$19.8" (the memo table and the simulator). `formatMxn` now prints "$19.80" for cents and keeps whole pesos as "$1,800". Test added. Redeployed.
+
+## Tomorrow's first move
+
+- **The real pricing conversation:** a fonda or tortillería, with the question on `/pricing`, no number in their mouth; then the pipero ("¿aceptarías que te paguen después de medir?"). Record exact words and each state in `lib/pricing-conversations.ts`.
+- Generate the mockup image from PACKET Appendix A → `docs/mockup-week14.png`.
+- Persona test (separate chat): fonda owner in Iztapalapa, from screenshots of `/pricing`; fix the worst confusion.
