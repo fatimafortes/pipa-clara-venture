@@ -25,6 +25,9 @@ export function Header() {
           <Link href="/about" className="py-1 underline-offset-4 hover:underline">
             Por qué
           </Link>
+          <Link href="/pricing" className="py-1 underline-offset-4 hover:underline">
+            Precios
+          </Link>
         </nav>
       </div>
     </header>
