@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Checkbox, Field, FormError, SubmitErrors } from "@/components/Field";
 import { MeasureGuide } from "@/components/MeasureGuide";
+import { FAMILY_FEE_PER_DELIVERY, defaultFeePerHousehold } from "@/lib/pricing";
 import { createDelivery, type DeliveryFormState } from "../actions";
 import { PhotoField } from "./PhotoField";
 
@@ -11,10 +12,12 @@ const initialState: DeliveryFormState = { errors: {}, values: {} };
 export function DeliveryForm({
   userId,
   maxHeightCm,
+  households,
   firstDelivery,
 }: {
   userId: string;
   maxHeightCm: number;
+  households: number;
   firstDelivery: boolean;
 }) {
   const [state, action, pending] = useActionState(createDelivery, initialState);
@@ -48,9 +51,10 @@ export function DeliveryForm({
         />
         <Field
           label="Cuota de Pipa Clara por hogar ($)"
+          hint={`$${FAMILY_FEE_PER_DELIVERY} por pipa, repartidos entre ${households} hogares.`}
           name="feeMxn"
           inputMode="numeric"
-          defaultValue={v.feeMxn ?? "2"}
+          defaultValue={v.feeMxn ?? String(defaultFeePerHousehold(households))}
           error={state.errors.feeMxn}
         />
       </section>

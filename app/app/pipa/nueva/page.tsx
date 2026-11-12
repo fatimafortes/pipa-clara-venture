@@ -25,6 +25,7 @@ async function NewDelivery() {
     <DeliveryForm
       userId={user.id}
       maxHeightCm={Number(cistern.max_height_cm)}
+      households={Number(cistern.households_count)}
       // "¿Cómo mido?" starts open until her first pipa is saved; no new data needed
       firstDelivery={deliveries.length === 0}
     />
