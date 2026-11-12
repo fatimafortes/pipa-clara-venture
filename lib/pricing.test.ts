@@ -101,3 +101,12 @@ describe("delivery form default fee", () => {
     expect(defaultFeePerHousehold(1)).toBe(10);
   });
 });
+
+describe("money formatting (mechanical-pass bug)", () => {
+  it("shows cents with two digits", async () => {
+    const { formatMxn } = await import("./format");
+    expect(formatMxn(19.8)).toBe("$19.80");
+    expect(formatMxn(1800)).toBe("$1,800");
+    expect(formatMxn(7.23)).toBe("$7.23");
+  });
+});

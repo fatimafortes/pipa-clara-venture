@@ -18,8 +18,11 @@ export function formatLitersWord(liters: number): string {
   return `${number.format(liters)} litros`;
 }
 
+// Whole pesos stay whole ("$1,800"); cents always show two digits ("$19.80", never "$19.8")
+const cents = new Intl.NumberFormat("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export function formatMxn(pesos: number): string {
-  return `$${number.format(pesos)}`;
+  return `$${Number.isInteger(pesos) ? number.format(pesos) : cents.format(pesos)}`;
 }
 
 // "25 de octubre"
