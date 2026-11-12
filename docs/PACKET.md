@@ -1,240 +1,178 @@
-# Pipa Clara — Build Packet (Week 13, Real Humans)
+# Pipa Clara — Build Packet (Week 14, Pricing)
 
-**Founder:** Fátima Fortes Ortega · **Venture:** Pipa Clara · **Role this week:** Operator
-**Inputs:** [`CHARTER.md`](CHARTER.md) · [`PERSONAS.md`](PERSONAS.md) · Week 12 packet [`PACKET-4.md`](PACKET-4.md) · [`DECISIONS.md`](DECISIONS.md) · Week 13 Brain Bending brief · Team 13 Blueprint
-Written before any Week 13 code. No packet, no code.
+**Founder:** Fátima Fortes Ortega · **Venture:** Pipa Clara · **Role this week:** Adversary
+**Inputs:** [`CHARTER.md`](CHARTER.md) · Week 13 packet [`PACKET-13.md`](PACKET-13.md) · [`DECISIONS.md`](DECISIONS.md) · Week 14 Brain Bending brief (Adversary) · Team 8 Blueprint, Week 14
+Written before any Week 14 code. No packet, no code.
 
 ---
 
 ## 1. The problem, in my words
 
-Week 12 proved Pipa Clara works when I use it. It has never been used by someone who buys water and doesn't know me. Two things can kill it that no synthetic persona will show me:
+Pipa Clara has a price on its form ($2 per household) that I picked so nobody would say no. That is the politeness price this week's provocation is about, and my own Brain Bending fight killed it: I could not say who it is for, how it reaches me, or why it is worth paying.
 
-1. **The number can lie.** The verdict depends on a level read with a stick or a tape measure. On a 3 × 2.5 m cistern every centimeter is 75 liters. Today the app assumes ±2 cm per reading for every cistern. If real people read worse than that, the app can call an honest delivery "short" and push a family into a fight with the driver. If they read better, the margin is hiding liters that a family that buys water out of necessity can't afford to lose.
-2. **Real people may not get through it.** Strangers may not know their cistern's size, may not finish the readings while the driver waits, or may not trust the Google sign-in screen.
+This week the price has to tell the truth. Anyone, including me, must be able to see **who pays, how much, for what, compared with what they do today, and which numbers are measured and which are guesses.** The uncomfortable part is that most of the value rests on one number nobody has measured (how often a pipa delivers short), and on a margin of error that can be bigger than the shortfall it is supposed to catch. The site must show that, not hide it.
 
-This week I put Pipa Clara in front of five real people, measure how precise their readings really are, and fix the worst thing they show me.
+## 2. The exact user, and who actually pays
 
-## 2. The exact user
-
-**The organizer** (Persona Rosa): the person who orders the truck, pays the driver and collects from the households. This week, specifically: **people in CDMX who buy private pipas because the public supply doesn't arrive or takes too long**, recruited from university staff (security, cleaning, cafeteria, maintenance) and their cistern neighbors. **At least 3 of 5 are strangers to me.** I record their role and where I found them, never their name.
+- **User:** the organizer, the person in a group of households sharing a cistern who orders the private pipa, pays the driver and keeps the record. Same person as Weeks 12–13. These are families who buy private pipas because the government pipa doesn't arrive when promised or when they need it.
+- **Who pays (Families tier):** the households, through their share. Pipa Clara's fee is **$10 per delivery**, added to the cost of the pipa and split in the same equal shares the organizer already collects (about $2 per household in a cistern of 5). Everyone sees the total before they commit.
+- **Who never pays:** the driver and the water company (the party measured cannot fund the measurement). The neighbors never pay anything separate and never need the app: they receive the WhatsApp summary free.
+- **Second segment:** small businesses that buy private pipas (fondas, tortillerías, laundries; car washes excluded). The business owner is user and payer.
 
 ## 3. Success definition
 
-**Before the module closes:**
+**Before the module closes, at www.pipa-clara.site:**
 
-- Five real people (at least three strangers) have tried Pipa Clara at **www.pipa-clara.site**, each session documented (role, task, struggle, exact quote, what they did).
-- The verdict shows a **margin calculated from the cistern's own repeated readings**, and an honest message when the measured liters are below the claim but inside the margin.
-- Every visit is recorded in an **event log**, so a return visit is visible without asking anyone.
-- The **#1 pain from the sessions is fixed and redeployed**, with before/after evidence.
-- At least **one user comes back on their own** (a repeat visit in the event log, a voluntary sign-up, or a message asking to use it again).
+- **`/pricing` is live** with 3 tiers (Vecinos free, Familias $10 per delivery, Negocios priced from data), 2 segments, and the free-vs-paid line explained.
+- **The simulator works:** users, conversion, deliveries per month and price → monthly and annual revenue, cost to serve and margin; plus the value ratio per payer and whether the expected shortfall is even detectable with the cistern's margin of error. **Every assumption is visible and labeled measured / assumed / analogy.** Scenarios can be **saved** and **shared by link**.
+- **`/about` holds the 10:1 memo,** built from the same numbers as the simulator (one source file), with the honest result even where it misses 10:1.
+- **The real pricing conversation is logged on `/pricing`,** with asked / said yes / approved in writing / paid / renewed as separate states. A "no" counts as evidence.
+- **The delivery form defaults to the new price** ($10 per delivery split among households).
 
 ## 4. Mockup
 
-![Pipa Clara verdict screen, Week 13 mockup](mockup-week13.png)
+![Pipa Clara pricing simulator, Week 14 mockup](mockup-week14.png)
 
-*Generated from the screen description in Appendix A. Example data, labeled on screen. New this week: the repeated reading, the margin that comes from it, and the message for "below the claim but inside the margin".*
+*Generated from the screen description in Appendix A with the founder's LLM image generation. Example data, labeled on screen.*
 
 ## 5. How the feature works
 
-### 5.1 Flowchart: the precision check and the new verdict message
+### 5.1 Flowchart: from assumptions to price, ratio and detectability
 
 ```mermaid
 flowchart TD
-    A[Organizer opens Nueva pipa] --> B{Pump to the tinaco off?}
-    B -- No / not sure --> B2[Warning: turn it off or the result will say 'no se pudo medir']
-    B2 --> C
-    B -- Yes --> C[BEFORE reading: level in cm + photo]
-    C --> D[Precision check: pull the stick out, put it back, read again]
-    D --> E{Second reading given?}
-    E -- No --> F[Use default error: 2 cm per reading]
-    E -- Yes --> G["Spread = |reading 1 − reading 2|<br/>error per reading = max(1 cm, spread)"]
-    F --> H[Truck unloads]
-    G --> H
-    H --> I[AFTER reading: level + photo]
-    I --> J["Margin (L) = 2 × error × liters per cm"]
-    J --> K{Pump ran, overflow, or reading missing?}
-    K -- Yes --> V3[NO SE PUDO MEDIR]
-    K -- No --> L{Measured ≥ claimed − margin?}
-    L -- No --> V2["FALTANTE: shows missing liters + range"]
-    L -- Yes --> M{Measured < claimed?}
-    M -- Yes --> V1b["CONSISTENTE + 'about X L less, inside the margin'"]
-    M -- No --> V1[CONSISTENTE]
-    V1 --> N[Event log: verdict_viewed]
-    V1b --> N
-    V2 --> N
-    V3 --> N
+    A[Visitor opens /pricing] --> B[Picks segment: Familias or Negocios]
+    B --> C[Defaults load from lib/pricing.ts<br/>each tagged measured / assumed / analogy]
+    C --> D[Visitor edits inputs]
+    D --> E["Revenue = cisterns × conversion × deliveries/month × price"]
+    D --> F["Cost to serve = setup + support minutes × hourly value"]
+    E --> G[Monthly and annual revenue, margin]
+    F --> G
+    D --> H["Value per delivery = time saved × wage + shortfall % × pipa cost"]
+    H --> I["Ratio = value ÷ price<br/>for the group and for each household"]
+    I --> J{Ratio ≥ 10?}
+    J -- Yes --> J1[Shows 'se sostiene 10:1']
+    J -- No --> J2[Shows the real ratio and what would have to be true]
+    D --> K["Margin (L) = 2 × error cm × liters per cm"]
+    K --> L{"Expected shortfall (L) > margin?"}
+    L -- No --> L1["Warning: a typical shortfall can't be detected with this margin"]
+    L -- Yes --> L2[Detectable]
+    G --> M{Save?}
+    M -- Save --> N[Scenario stored in this browser + shareable link]
 ```
 
-### 5.2 Swimlane: who does what in a real-user session
+### 5.2 Swimlane: who does what with the money for one delivery
 
 ```mermaid
-sequenceDiagram
-    participant F as Fátima (observer)
-    participant U as Real user (organizer)
-    participant A as Pipa Clara (app)
-    participant L as Event log (Supabase)
-    F->>U: Consent: what I record, no names, can stop anytime
-    U->>A: Sign in with Google (own account)
-    A->>L: signed_in
-    U->>A: Task A: register cistern (estimates if away from it)
-    A->>L: cistern_created
-    U->>A: Task B: replay last delivery, before reading twice
-    A->>L: delivery_saved (verdict, spread in cm)
-    U->>A: Task D: reads the verdict, says what they'd do
-    A->>L: verdict_viewed
-    F->>F: Records struggle, time, exact quote (no help for 60 s)
-    U-->>F: Later: photos of a real reading, or comes back alone
-    A->>L: signed_in on another day = return signal
+flowchart LR
+    subgraph O[Organizer]
+        O1[Orders pipa] --> O2[Takes before reading, plate photo]
+        O3[Takes after reading] --> O4[Pays driver the pipa price]
+        O5[Marks each share paid] --> O6[Keeps the $10 fee aside]
+        O6 --> O7[Transfers fees to Pipa Clara monthly<br/>NOT ACTIVE in pilot]
+    end
+    subgraph H[Households]
+        H1[See total incl. $10 before committing] --> H2[Pay their share to the organizer]
+    end
+    subgraph D[Pipero]
+        D1[Delivers, invited to witness] --> D2[Receives pipa price only]
+    end
+    subgraph P[Pipa Clara]
+        P1[Verdict with margin] --> P2[Splits pipa + $10 in equal shares]
+        P2 --> P3[WhatsApp summary, free for neighbors]
+    end
+    O2 --> D1 --> O3 --> P1
+    P2 --> H1
+    H2 --> O5
+    O4 --> D2
 ```
+
+The fee never passes through the pipero's hands (Brain Bending, open Kill #2).
 
 ## 6. What I build this week
 
-**Slice A — known before the sessions (build first):**
-
-| # | Feature | Why | Acceptance |
-|---|---|---|---|
-| A1 | **Event log** `pc_events` | Required this week (stack floor); gives the return signal without asking | Each of: `signed_in`, `cistern_created`, `delivery_saved`, `verdict_viewed`, `summary_sent`, `challenge_saved` writes one row; a user only sees and writes their own rows; no free text, no IP, no device data |
-| A2 | **Precision check** on the before reading | My Blueprint declaration: test reading accuracy with repeated measurements | Optional second reading of the same level; the spread is saved; the margin uses it; without it, the default 2 cm applies |
-| A3 | **Honest uncertainty messages** | Brief, section 5: always show the real number, only accuse outside the margin | Verdict shows the range ("entre 8,400 y 9,000 L"); a consistent delivery below the claim says "unos X L menos, dentro del margen"; a pump question appears before the readings |
-| A4 | **Retry once on `PGRST303`** | Open risk from Week 12: the first screen after sign-in can fail, and that is a stranger's first impression | A `PGRST303` answer is retried once after ~1 s; logged |
-| A5 | **Strangers can sign in** | The shared Google OAuth client is in Testing mode: only listed test users can enter | Consent screen published (only `email`/`profile` scopes, no verification needed) or every tester added before their session; checked with an account that was never used before |
-
-**Slice B — decided by the sessions (amendment before code):**
-
-| # | Feature | Rule |
+| # | Feature | Acceptance |
 |---|---|---|
-| B1 | **Fix for the #1 pain** | Chosen from the pain ranking (section 13), not from my preferences. Written as an addendum to this packet (`## 14. Addendum`) with the user quote that justifies it **before** its first commit. Before/after evidence: screenshot + the same task timed before and after. |
+| P1 | **`lib/pricing.ts`**: one source for every assumption and the pure math | Each assumption has value, unit, status (`measured` / `assumed` / `analogy`) and source; functions for revenue, cost to serve, value per delivery, ratios, detectability; unit tests |
+| P2 | **`/pricing` page**: tiers, segments, free-vs-paid line, shadow clause | 3 tiers, 2 segments; header link "Precios" |
+| P3 | **Simulator** (client component) | Inputs → outputs update live; assumptions labeled; "SIMULACIÓN" badge; validation (ranges, numbers only) |
+| P4 | **Saved scenarios** | Save with a name in this browser (`localStorage`, try/catch, works without it); "Copiar enlace" encodes inputs in the URL; opening the link restores them; no personal data |
+| P5 | **10:1 memo on `/about`** | Today's workflow vs Pipa Clara, same task (one delivery) and period; money + time + risk; measured vs assumed; ratio per payer; reads its numbers from `lib/pricing.ts` |
+| P6 | **Pricing conversation log** on `/pricing` | Entries from `lib/pricing-conversations.ts` with separate states; the pending conversation shows the exact question |
+| P7 | **Form default = new price** | "Nueva pipa" fee default per household = `max(1, round(10 / households))` (5 → $2, 3 → $3, 12 → $1); label explains "$10 por pipa, repartido" |
 
-## 7. The engine change (precision)
+## 7. The pricing math (pure, checkable by hand)
 
-- Liters per cm (unchanged): `length_m × width_m × 10`.
-- **Error per reading:** `e = 2 cm` by default. If the before reading was taken twice: `e = max(1 cm, |r1 − r2|)`. The 1 cm floor stops a lucky identical pair from claiming impossible precision.
-- **Margin:** `margin_L = round(2 × e × liters_per_cm)` (two readings, before and after).
-- Verdict rules are unchanged: missing reading / pump ran / overflow / after ≥ max height → `couldnt_measure`, and then no liters number is shown.
-- New output field: `belowClaimInsideMargin = measured < claimed && verdict = consistent`, used only for the message.
-- Still pure arithmetic, no AI, checkable by hand. Example: 3 × 2.5 m → 75 L/cm. Readings 41 and 42 cm → e = 1 cm → margin 150 L (Week 12 fixed: 300 L). Readings 40 and 43 cm → e = 3 cm → margin 450 L, and the screen says the reading was imprecise.
+- **Revenue/month** = cisterns reached × conversion × deliveries per month × price.
+- **Cost to serve/month** = (new cisterns × setup min + active cisterns × support min) ÷ 60 × founder hourly value. Hosting $0 (free tiers).
+- **Value per delivery** = max(0, collection hours − measuring hours) × hourly wage (Families only; a business has no shares to collect) + shortfall rate × pipa price.
+- **Ratios:** group = value ÷ price. Each household = (shortfall value ÷ households) ÷ (price ÷ households) = shortfall value ÷ price, the honest number the Adversary found (about 2:1).
+- **Price at 10:1** = value ÷ 10 (used for the Negocios tier).
+- **Detectability:** margin L = 2 × error cm × length × width × 10 (same as `computeVerdict()`); expected shortfall L = rate × liters claimed. Not detectable when shortfall ≤ margin.
+- **Worked example (defaults):** pipa $1,800, 10,000 L, 1.1% shortfall → $19.80; 1.5 h collecting − 10 min measuring = 1.33 h × $39.38 = $52.51; value $72.31 → **7.2:1 at $10, not 10:1.** Cistern 3 × 2.5 m, 2 cm error → 75 L/cm → margin 300 L; expected shortfall 110 L → **not detectable.** The site says both.
 
 ## 8. Benchmark line
 
-- **The best existing solution on Earth for this is** Nairobi's water ATMs: the meter sits at the point of sale, so the liters are never in dispute (Brain Bending brief, Week 13).
-- **Mine localizes it by** measuring from the buyer's side, with no hardware and nobody's permission, and turning the household's own repeated readings into an honest margin, because in CDMX private pipas have no meter and no registry.
+- **The best existing solution on Earth for this is** LP gas in stationary tanks in Mexico: the household checks the tank's level against the liters charged, backed by a meter Profeco regulates.
+- **Mine localizes it by** giving water pipas the same before/after check with no regulated meter, so every verdict declares its own margin of error, and its price is set by what that check is worth to the family that buys out of necessity.
 
 ## 9. The long view
 
-If this slice works, Pipa Clara knows how precise each cistern's measurement really is, which is what turns a household's reading from a suspicion into evidence. In three years that record lets buildings that order regularly choose the pipero who delivers full, and lets honest piperos who opt in show a verified history. Every load-bearing decision this week (margin from real error, no public record without consent, no accusation inside the margin) is there so that record can be trusted by both sides.
+If this slice works, Pipa Clara has a price it can defend and a simulator that updates itself as real deliveries replace the gasoline analogy. In three years the fee from families and businesses that buy regularly pays for the measurement, and a measured shortfall rate is the number that tells water companies and regulators whether pipa water needs a meter like LP gas. The load-bearing walls this week are that every assumption is labeled, the fee never touches the pipero, and payment never changes a verdict.
 
 ## 10. Scope cut: what I am NOT building this week
 
-- No report sent to the water company or the pipero (the brief's "send to supplier" idea is a later phase).
-- No public or shared pipero record; no pipero phone numbers stored (Blueprint condition 5).
-- No AI reading of the photo; the user still types the level.
-- No analytics service (Google Analytics, PostHog, etc.): the event log is one Supabase table.
-- No new features beyond Slice A and the single #1 fix, even if users ask for them; requests go to DECISIONS.md as findings.
-- No incentives paid to testers; the only thing I give is their cistern's real capacity.
+- No payment processing or fee collection (no Clip, no transfers): the monthly transfer is shown as **not active in the pilot**.
+- No change to the database or the payment flow (families still pay their share to the organizer); "pay at the door after the after reading" from Brain Bending is a later change.
+- No business accounts or business-specific screens; the Negocios tier lives on `/pricing` and in the simulator only.
+- No scenarios stored in Supabase (no auth needed, no personal data).
+- No run-out prediction (needs readings between deliveries; Rotoplas already sells that sensor).
 
 ## 11. Architecture and stack
 
-Same stack as Week 12; only additions are listed.
+Same stack as Week 13; only additions are listed.
 
 | Layer | Choice | Change this week |
 |---|---|---|
-| Frontend | Next.js 16 (App Router) + React + Tailwind | Precision field, new verdict messages |
+| Frontend | Next.js 16 (App Router) + React + Tailwind | `/pricing` page, simulator client component, `/about` memo |
 | Hosting | Vercel, **www.pipa-clara.site** | — |
-| Auth | Supabase Auth, Sign in with Google (shared "semestre" project) | OAuth consent screen opened to strangers (A5) |
-| Database | Supabase Postgres, RLS on every `pc_` table | **New:** `pc_events`; `pc_readings.repeat_level_cm` (nullable) |
-| Files | Private bucket `pc_readings` | — |
-| Logic | Pure functions `computeVerdict()`, `splitShares()` | `computeVerdict()` takes the optional repeat reading |
-| Analytics | **`pc_events`** (organizer_id, name, delivery_id, created_at) | Names from a fixed list (CHECK constraint); RLS insert/select own rows; no update/delete |
-| Repo | GitHub `fatimafortes/pipa-clara-venture` | Migration `…_pc_week13.sql` only adds `pc_` objects |
+| Auth / DB | Supabase (Google sign-in, RLS) | **None** |
+| Logic | Pure functions | **New:** `lib/pricing.ts` (+ tests); `lib/pricing-conversations.ts` (data) |
+| Storage | — | Saved scenarios in `localStorage` (per browser) + URL query for sharing |
 
 ## 12. Security floor (checked before building)
 
-1. **No secrets:** nothing new; keys stay in Vercel env vars.
-2. **Auth:** unchanged; new tables only reachable when signed in.
-3. **RLS:** `pc_events` with insert/select `organizer_id = auth.uid()`, no update/delete; the RLS test script gains event checks (account B can't read A's events).
-4. **Validation:** repeat reading 0 – max height, same as the other levels; event names only from the fixed list.
-5. **No real personal data in demos:** demo video uses an invented cistern labeled "DATOS DE EJEMPLO". Session notes use roles, never names; photos show only the cistern.
+1. **No secrets:** nothing new.
+2. **Auth:** `/pricing` and `/about` are public and store nothing personal; the app stays behind Google sign-in.
+3. **RLS:** no new tables.
+4. **Validation:** every simulator input clamped to a range and parsed as a number; scenario names max 40 characters; URL parameters parsed the same way, unknown keys ignored.
+5. **No real personal data:** the conversation log records role and segment, never names or phone numbers; simulated numbers labeled "SIMULACIÓN".
 
 ## 13. Test plan
 
 **Mechanical pass**
 
-- `computeVerdict()`: no repeat → margin as Week 12; spread 0 → 1 cm floor; spread 3 cm → margin triples; 80 L below the claim inside the margin → consistent + `belowClaimInsideMargin`; couldn't-measure cases still return no liters.
-- Event log: each event writes one row; account B can't read A's events; an unknown event name is rejected by the database.
-- `PGRST303`: simulated error is retried once and then succeeds.
-- Sign-in with a Google account that was never a test user.
-- Find at least one bug, fix it, redeploy, log it in DECISIONS.md.
+- `lib/pricing.ts`: worked example above (7.2:1, 300 L margin, not detectable); value never negative when measuring takes longer than collecting; business value has no time component; price at 10:1; revenue/cost with 0 conversion; URL encode → decode round trip; out-of-range values clamped.
+- Pages: `/pricing` and `/about` render on phone width with no horizontal scroll; saving works and survives reload; saving with storage blocked shows a message, not a crash; a shared link restores the scenario in a private window.
+- Delivery form: default fee for 3, 5 and 12 households.
+- Types, lint, tests, build. Find at least one bug, fix it, redeploy, log it.
 
 **Persona pass (Layer 1, separate chat)**
 
-- Rosa walks the new screens (pump question, second reading, new verdict messages) with the driver waiting; log every confusion; fix the worst.
+- A fonda owner in Iztapalapa who buys private pipas several times a week in dry months, uses WhatsApp, distrusts apps and reads numbers carefully. She walks `/pricing` from screenshots and says whether she understands what she would pay and why. Log every confusion; fix the worst.
 
-**Real-user pass (Layer 2, the point of this week)**
-
-- 5 sessions, at least 3 strangers, ~10 minutes, with consent. Part 1: story of the last delivery ("What's worse, a short delivery or a neighbor who doesn't pay?", "Did you try the government pipa first? How many days did you wait?", "Do you buy all year?"). Part 2: tasks A (cistern), B (replay delivery, before reading twice), C (split), D ("about X liters missing, what do you do now?"), silent observation, help only after 60 s. Part 3: ask for the next pipa photos, not compliments.
-- **Precision check:** two readings of the same level with the stick pulled out in between; record the spread in cm.
-- One sheet per session: role and where found, stranger yes/no, story, pain answer, tasks ✅/⚠️/❌ with time, spread, 2–3 exact quotes in Spanish, commitment.
-- **Pain ranking:** score each finding 1–3 on severity, frequency, behavior, and threat to the 10:1 case. A false "short" verdict outranks anything cosmetic (Blueprint, Bet C). Warning signs of fixing the easy pain: my #1 is something I already knew how to fix, or a finding that contradicts my written prediction ranks low.
-- **Return signal:** from `pc_events`, a `signed_in` on a different day by a tester, or a message they send on their own. "Would use again" in the session doesn't count.
-
-**Kill conditions:** most testers can't produce a level reading at all; the spread of repeated readings is so large that the margin hides most short loads; nobody comes back.
-
-## 14. Blueprint conditions honored
+## 14. Blueprint conditions honored (Team 8, Week 14)
 
 | Condition | How |
 |---|---|
-| 1. 3 of 5 strangers from the real segment, source recorded | Recruited from university staff and their cistern neighbors; sheet records role + source + stranger yes/no |
-| 2. Realistic, uncoached task; exact words; behavior separate from interpretation | Task cards, 60-second rule, separate "what they did" / "what I think it means" columns |
-| 3. Rank three pains by core-task damage; fix the real #1; before/after evidence | Section 13 ranking; Slice B addendum with quote before code; timed task before and after |
-| 4. One independent return signal | `pc_events` repeat visit, voluntary sign-up or unprompted message |
-| 5. Shadow clause | Consent first; roles not names; photos only of the cistern; no pipero record or phone stored; accusation only outside an honest margin |
-| 6. No 10:1 claim without a baseline | Baseline from sessions: what they do today when a pipa looks short, and what it cost them |
-
----
-
-## 15. Addendum: the #1 pain from real users
-
-*Written after the five real-user sessions and before the Slice B code (PACKET §6, B1). Roles only, never names. Quotes as recorded in the founder's session notes.*
-
-### Sessions
-
-**Strangers: sessions 1, 2, 4 and 5 (4 of 5).** Session 3 (the father) is someone I knew. Blueprint condition 1 (at least 3 of 5) is met.
-
-| # | Role (stranger?) | Worse: short pipa or a neighbor who doesn't pay? | Struggle (what they did) | Quote |
-|---|---|---|---|---|
-| 1 | Woman who organizes the pipas · stranger | **A neighbor who doesn't pay**: "I end up putting in the money and then I have to collect." | Couldn't find where to record each neighbor's payment. | "Esto me serviría para no tener que estar anotando todo en mi libreta." |
-| 2 | Building security guard (doesn't pay; the administrator does) · stranger | Short pipa ("everyone comes to complain to me") | Needed help to find where to register the cistern; over 60 s on each step. | "Si usted no me explica no entendería nada, señorita." |
-| 3 | Father, building with administration · known to me | Short pipa | Didn't know whether to enter the liters ordered or the liters received. Asked how much each apartment pays. | "Tendría que utilizarlo el administrador." |
-| 4 | Young neighbor · stranger | **A neighbor who doesn't pay** (one always pays late) | Couldn't find how to attach the photo. | — |
-| 5 | Neighbor, 20,000 L pipas, two suppliers · stranger | **A neighbor who doesn't pay** | Looked for a delivery history per supplier. | "Siempre acaba en discusión." |
-
-**Unobserved use:** two of my relatives used the link alone, without me. They said it was hard, and they couldn't find the photo upload.
-
-**Finding that may challenge the premise:** 3 of 5 already have a water meter on their cistern. Not recorded: whether the meter is on the city supply line (it doesn't measure the pipa) or where the pipa unloads (then the liters may not be in dispute for them). To ask in the next sessions; not addressed by this fix.
-
-### Return signal (Blueprint condition 4)
-
-One of the two relatives who used the link on her own (not one of the five observed sessions) **came back to the app later to send the WhatsApp summary.** After leaving, she couldn't find her way back to it, and she **messaged me a screenshot on her own initiative** (kept, with her name hidden). Honest limit: she is a relative, not a stranger, so this is a weaker kind of independence than a stranger coming back. It is also evidence for the #1 pain: she came back for the summary and couldn't find it.
-
-### Pain ranking (severity, frequency, behavior, threat to the 10:1 case)
-
-1. **What the organizer needs after the verdict can't be found.** Marking who paid is at the bottom of the verdict page, and the returning user couldn't get back to the WhatsApp summary. **The 3 people who organize or pay ranked "a neighbor who doesn't pay" as worse, which contradicts my written prediction that measurement was the main value.**
-2. **First steps unclear:** what to fill first; "litros que dijo el pipero" read as liters ordered vs. received.
-3. **Photo upload not found** (session 4 and both relatives).
-
-**Warning-sign check (§13):** moving payments up is something I could have done before the sessions. What the sessions changed is *why*: for the people who pay, collecting is the job, not a detail under the verdict. The fix also covers the half I could not have predicted: the way back to the summary for someone who returns.
-
-### The fix (B1), smallest
-
-- On the verdict page, move "Pagos" right under "Cada hogar paga", with the heading **"¿Quién ya te pagó?"** and the instruction **"Toca cada hogar cuando te pague"**.
-- Make **"Ya pagaron: X de N"** a link that jumps there.
-- On the `/app` list, each pipa shows two clear actions: **"Ver pagos"** and **"Mandar resumen"**.
-- No new data, no migration.
-- **Before/after evidence:** screenshots of the verdict page and the `/app` list, plus the same task timed before and after ("you're back a day later: mark that Depto 2 paid and send the summary").
+| 1. User and budget owner identified; total price and scope disclosed | Each tier names user and payer; $10 shown inside the delivery total before households commit |
+| 2. Quote request, written approval, payment, renewal logged separately; simulated labeled | Conversation log with separate states; simulator badge "SIMULACIÓN" |
+| 3. Compare with the current workflow; verified benefit ÷ total cost vs 10:1 | 10:1 memo: notebook + cash collection vs Pipa Clara, same delivery; ratio shown even when below 10 |
+| 4. Track setup, support and delivery costs incl. founder labor | Cost to serve in the simulator: setup and support minutes × hourly value |
+| 5. Shadow clause | Payment buys the service, never a different verdict; evidence and margin always visible; disagreements never deleted; the fee never passes through the pipero |
 
 ---
 
 ## Appendix A: mockup screen description
 
-> Mobile screen, Spanish UI, app "Pipa Clara" (water-drop logo, teal and white), badge "DATOS DE EJEMPLO". Title "Pipa del 6 de noviembre". Rows: "Litros que dijo el pipero: 10,000 L" and "Litros que entraron (medidos): 9,900 L · entre 9,750 y 10,050 L". Teal verdict card: "Consistente" and below, smaller: "Entraron unos 100 L menos de lo que dijo el pipero, dentro del margen de medición de 150 litros." A small grey box: "Precisión de tu medición: medida dos veces, diferencia de 1 cm". Two photo thumbnails: "Antes · 08:02 · 41 cm, con el pipero presente" and "Después · 08:41 · 173 cm". Then "Cada hogar paga: $152", "Ya pagaron: 0 de 12", green button "Mandar resumen por WhatsApp", outlined "Registrar desacuerdo". Large readable text for a 55-year-old, flat, no clutter.
+> Mobile screen, Spanish UI, app "Pipa Clara" (water-drop logo, teal and white), amber badge "SIMULACIÓN". Title "¿Cuánto vale Pipa Clara?". Two tabs: "Familias" (selected) and "Negocios". Input rows with small grey tags: "Precio de la pipa $1,800 · medido", "Faltante esperado 1.1% · analogía gasolina, sin validar", "Horas cobrando 1.5 · supuesto", "Cuota Pipa Clara $10 por pipa". A large result card: "Valor por pipa: $72 · Precio: $10 · 7.2 a 1" with an amber note "Todavía no llega a 10 a 1". Below, an amber box: "Con un margen de 300 L, un faltante de 110 L no se puede detectar." Bottom: "Ingresos al mes: $1,200 · al año: $14,400" and buttons "Guardar escenario" and "Copiar enlace". Large readable text, flat, no clutter.
