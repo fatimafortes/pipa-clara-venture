@@ -225,7 +225,13 @@ export function Simulator() {
               tiempo ahorrado es de quien organiza.
             </li>
           )}
-          {!isFamily && <li>Un negocio no reparte entre vecinos: su único valor medible es el faltante.</li>}
+          {!isFamily && (
+            <li>
+              Un negocio no reparte entre vecinos: su único valor medido es el faltante. Saber cuándo pedir la siguiente
+              pipa todavía no tiene número; con esta cuota tendría que valer{" "}
+              {formatMxn(Math.max(0, Math.round(s.feeMxn * 10 - value.total)))} por pipa para llegar a 10 a 1.
+            </li>
+          )}
         </ul>
 
         <div

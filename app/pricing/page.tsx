@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { formatMxn } from "@/lib/format";
 import { CONVERSATIONS, STATE_LABEL, type ConversationState } from "@/lib/pricing-conversations";
-import { DEFAULTS, FAMILY_FEE_PER_DELIVERY, defaultFeePerHousehold, priceAt10to1 } from "@/lib/pricing";
+import { DEFAULTS, FAMILY_FEE_PER_DELIVERY, defaultFeePerHousehold, priceAt10to1, valuePerDelivery } from "@/lib/pricing";
 import { Simulator } from "./Simulator";
 
 export const metadata: Metadata = {
@@ -14,6 +14,8 @@ const ALL_STATES: ConversationState[] = ["asked", "said_yes", "approved_in_writi
 export default function PricingPage() {
   const perHousehold = defaultFeePerHousehold(DEFAULTS.familias.households);
   const businessPrice = priceAt10to1(DEFAULTS.negocios);
+  const businessShortfall = valuePerDelivery(DEFAULTS.negocios).shortfall;
+  const businessNeeded = DEFAULTS.negocios.feeMxn * 10 - businessShortfall;
 
   return (
     <div className="space-y-12">
@@ -54,17 +56,26 @@ export default function PricingPage() {
         <article className="space-y-2 rounded-2xl border-2 border-amber bg-white p-5">
           <p className="text-sm font-bold tracking-widest text-amber">NEGOCIOS · fondas, tortillerías, lavanderías</p>
           <p className="text-3xl font-bold">
-            {formatMxn(Math.round(businessPrice))} <span className="text-xl font-semibold">por pipa, por ahora</span>
+            {formatMxn(DEFAULTS.negocios.feeMxn)} <span className="text-xl font-semibold">por pipa, precio de prueba</span>
           </p>
           <ul className="list-disc space-y-1 pl-5 leading-relaxed">
             <li>
               <strong>Usa y paga:</strong> el dueño o encargado del negocio.
             </li>
             <li>
-              <strong>Regla:</strong> precio = lo que vale una pipa medida ÷ 10. Hoy ese valor sale de una analogía con
-              la gasolina, así que el precio es bajo y honesto. Se recalcula con las primeras 10 pipas medidas.
+              <strong>Por qué {formatMxn(DEFAULTS.negocios.feeMxn)}:</strong> un encargado de fonda dijo que sí a ese
+              precio en una conversación real. Lo primero que pidió fue organizarse: saber cuánta agua tiene y cuándo
+              pedir la siguiente pipa.
             </li>
-            <li>Un negocio no reparte entre vecinos: su valor es el faltante y saber cuándo pedir la siguiente pipa.</li>
+            <li>
+              <strong>Lo que todavía no está probado:</strong> el faltante solo vale unos{" "}
+              {formatMxn(businessShortfall)} por pipa, así que a este precio el 10 a 1 depende de que saber cuándo
+              pedir valga unos {formatMxn(Math.round(businessNeeded))} por pipa. Nadie lo ha medido.
+            </li>
+            <li>
+              <strong>Regla:</strong> con las primeras 10 pipas medidas de un negocio le preguntamos si le ayudó a pedir
+              a tiempo. Si no, el precio baja a lo que vale una pipa medida ÷ 10 (hoy, {formatMxn(businessPrice)}).
+            </li>
           </ul>
         </article>
 

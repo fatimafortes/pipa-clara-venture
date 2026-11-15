@@ -81,7 +81,10 @@ export const SOURCES: Record<Exclude<keyof Scenario, "segment">, Assumption> = {
     source:
       "Familias: 2 al mes, supuesto. Negocios: 2 en un mes normal, medido con 1 fonda (nov 2026); en la crisis de 2024 eran 3 a 4 por semana",
   },
-  feeMxn: { status: "measured", source: "Precio decidido: $10 por pipa para familias" },
+  feeMxn: {
+    status: "measured",
+    source: "Precio decidido: $10 por pipa para familias; $20 de prueba para negocios (un pagador real dijo que sí)",
+  },
   pipaPriceMxn: {
     status: "measured",
     source: "Profeco: $1,802.94 promedio CDMX (ene 2023). Negocios: $1,500, medido con 1 fonda (nov 2026)",
@@ -127,7 +130,7 @@ export const DEFAULTS: Record<Segment, Scenario> = {
     cisterns: 20,
     conversionPct: 50,
     deliveriesPerMonth: 2,
-    feeMxn: 2,
+    feeMxn: 20,
     pipaPriceMxn: 1500,
     litersClaimed: 10000,
     shortfallPct: 1.1,

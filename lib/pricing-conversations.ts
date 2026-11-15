@@ -41,7 +41,7 @@ export const CONVERSATIONS: Conversation[] = [
     answer:
       "Sí me serviría bastante, sobre todo para organizarme. Así sabría cuánto agua tengo realmente y cuándo tengo que pedir otra pipa. […] Pues sí, $20 no se me hace mucho si de verdad funciona y me da esa información. […] Ahí ya lo pensaría un poquito más, pero si me demuestra que la pipa me está entregando menos agua de la que estoy pagando, sí los pagaría.",
     whatItMeans:
-      "Dijo que sí a $20, diez veces el precio publicado, pero condicionado a que funcione; todavía no aprueba ni paga. Lo primero que nombró no fue el faltante sino organizarse: saber cuánta agua tiene y cuándo pedir otra pipa. En un mes normal compró 2 pipas de $1,500, no 13: el simulador ya usa esos números. A $50 solo paga si se demuestra un faltante, así que ese precio depende de las primeras pipas medidas.",
+      "Dijo que sí a $20, condicionado a que funcione; todavía no aprueba ni paga. Por esta respuesta, $20 es ahora el precio de prueba para negocios (antes $2). Lo primero que nombró no fue el faltante sino organizarse: saber cuánta agua tiene y cuándo pedir otra pipa. En un mes normal compró 2 pipas de $1,500, no 13: el simulador ya usa esos números. A $50 solo paga si se demuestra un faltante, así que ese precio depende de las primeras pipas medidas.",
     states: ["asked", "said_yes"],
   },
   {
