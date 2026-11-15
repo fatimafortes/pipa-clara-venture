@@ -33,7 +33,7 @@ This week the price has to tell the truth. Anyone, including me, must be able to
 
 ![Pipa Clara pricing simulator, Week 14 mockup](mockup-week14.png)
 
-*Generated from the screen description in Appendix A with the founder's LLM image generation. Example data, labeled on screen.*
+*Generated with Canva image generation from the screen description in Appendix A, using the Week 13 mockup as style reference. Example data, labeled on screen.*
 
 ## 5. How the feature works
 
