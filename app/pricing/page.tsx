@@ -55,28 +55,49 @@ export default function PricingPage() {
 
         <article className="space-y-2 rounded-2xl border-2 border-amber bg-white p-5">
           <p className="text-sm font-bold tracking-widest text-amber">NEGOCIOS · fondas, tortillerías, lavanderías</p>
-          <p className="text-3xl font-bold">
-            {formatMxn(DEFAULTS.negocios.feeMxn)} <span className="text-xl font-semibold">por pipa, precio de prueba</span>
+          {/* Persona test fix (Doña Carmen quit here): one price, her value first, the founder math folded away */}
+          <p className="rounded-xl bg-teal-soft px-3 py-2 font-semibold text-teal">
+            Hoy no cobramos: todavía estamos probando.
           </p>
-          <ul className="list-disc space-y-1 pl-5 leading-relaxed">
+          <p className="text-3xl font-bold">
+            Después: {formatMxn(DEFAULTS.negocios.feeMxn)}{" "}
+            <span className="text-xl font-semibold">por pipa, aparte del agua</span>
+          </p>
+          <ul className="list-disc space-y-2 pl-5 text-lg leading-relaxed">
             <li>
-              <strong>Usa y paga:</strong> el dueño o encargado del negocio.
+              Sabes cuántos litros entraron de verdad y cuánta agua tenías cuando llegó la pipa.{" "}
+              <strong>Pronto:</strong> avisarte cuándo pedir la siguiente, antes de quedarte sin agua a media comida.
+              Todavía no está listo.
             </li>
             <li>
-              <strong>Por qué {formatMxn(DEFAULTS.negocios.feeMxn)}:</strong> un encargado de fonda dijo que sí a ese
-              precio en una conversación real. Lo primero que pidió fue organizarse: saber cuánta agua tiene y cuándo
-              pedir la siguiente pipa.
+              Si la pipa te deja mucho menos de lo que pagaste, lo ves con fotos y hora. Si te deja poquito menos, la
+              medición no alcanza a verlo.
             </li>
             <li>
-              <strong>Lo que todavía no está probado:</strong> el faltante solo vale unos{" "}
-              {formatMxn(businessShortfall)} por pipa, así que a este precio el 10 a 1 depende de que saber cuándo
-              pedir valga unos {formatMxn(Math.round(businessNeeded))} por pipa. Nadie lo ha medido.
+              <strong>Tú solo haces esto:</strong> 2 fotos de tu cisterna, una antes y otra después de que llegue la
+              pipa.
             </li>
-            <li>
-              <strong>Regla:</strong> con las primeras 10 pipas medidas de un negocio le preguntamos si le ayudó a pedir
-              a tiempo. Si no, el precio baja a lo que vale una pipa medida ÷ 10 (hoy, {formatMxn(businessPrice)}).
-            </li>
+            <li>Si después de 10 pipas no te ayudó a pedir a tiempo, te bajamos el precio.</li>
           </ul>
+          <p className="text-muted">Lo usa y lo paga el dueño o encargado del negocio.</p>
+          <details className="rounded-xl border border-line p-3">
+            <summary className="cursor-pointer py-1 font-semibold text-teal">Cómo calculamos este precio</summary>
+            <div className="mt-2 space-y-2 leading-relaxed text-muted">
+              <p>
+                Un encargado de fonda dijo que sí a {formatMxn(DEFAULTS.negocios.feeMxn)} en una conversación real. Lo
+                primero que pidió fue organizarse, no cachar pipas incompletas.
+              </p>
+              <p>
+                Lo que todavía no está probado: protegerte de una pipa incompleta vale unos{" "}
+                {formatMxn(businessShortfall)} por pipa. Para valer 10 veces su precio, saber cuándo pedir tendría que
+                valer unos {formatMxn(Math.round(businessNeeded))} por pipa. Nadie lo ha medido todavía.
+              </p>
+              <p>
+                Si no te ayudó, el precio baja a lo que vale una pipa medida entre 10 (hoy serían{" "}
+                {formatMxn(businessPrice)}).
+              </p>
+            </div>
+          </details>
         </article>
 
         <div className="space-y-2 rounded-2xl bg-teal-soft p-5">

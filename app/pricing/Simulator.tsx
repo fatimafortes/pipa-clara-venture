@@ -254,7 +254,10 @@ export function Simulator() {
           )}
         </div>
 
-        <dl className="grid grid-cols-2 gap-3 border-t border-line pt-4">
+        <p className="border-t border-line pt-4 font-semibold">
+          Números de Pipa Clara como negocio. No es lo que tú pagas.
+        </p>
+        <dl className="grid grid-cols-2 gap-3">
           <div>
             <dt className="text-sm text-muted">{isFamily ? "Cisternas que pagan" : "Negocios que pagan"}</dt>
             <dd className="text-xl font-bold">{number.format(payingCisterns(s))}</dd>
