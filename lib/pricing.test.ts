@@ -36,8 +36,9 @@ describe("value and ratios (PACKET §7 worked example)", () => {
   it("a business has no shares to collect: value is only the shortfall", () => {
     const v = valuePerDelivery(biz);
     expect(v.time).toBe(0);
-    expect(v.total).toBe(22);
-    expect(priceAt10to1(biz)).toBe(2.2);
+    // Measured with one fonda: $1,500 per pipa
+    expect(v.total).toBe(16.5);
+    expect(priceAt10to1(biz)).toBe(1.65);
   });
 
   it("no ratio when the fee is zero", () => {

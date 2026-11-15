@@ -78,12 +78,13 @@ export const SOURCES: Record<Exclude<keyof Scenario, "segment">, Assumption> = {
   conversionPct: { status: "assumed", source: "Escenario, no un dato" },
   deliveriesPerMonth: {
     status: "assumed",
-    source: "Familias: 2 al mes, supuesto. Negocios: 3 a 4 por semana, medido en la crisis de 2024 (La Silla Rota, OEM)",
+    source:
+      "Familias: 2 al mes, supuesto. Negocios: 2 en un mes normal, medido con 1 fonda (nov 2026); en la crisis de 2024 eran 3 a 4 por semana",
   },
   feeMxn: { status: "measured", source: "Precio decidido: $10 por pipa para familias" },
   pipaPriceMxn: {
     status: "measured",
-    source: "Profeco: $1,802.94 promedio CDMX (ene 2023). Negocios: $1,500–2,500 (La Jornada, 2024)",
+    source: "Profeco: $1,802.94 promedio CDMX (ene 2023). Negocios: $1,500, medido con 1 fonda (nov 2026)",
   },
   litersClaimed: { status: "assumed", source: "Pipa típica de 10,000 L" },
   shortfallPct: {
@@ -125,9 +126,9 @@ export const DEFAULTS: Record<Segment, Scenario> = {
     segment: "negocios",
     cisterns: 20,
     conversionPct: 50,
-    deliveriesPerMonth: 13,
+    deliveriesPerMonth: 2,
     feeMxn: 2,
-    pipaPriceMxn: 2000,
+    pipaPriceMxn: 1500,
     litersClaimed: 10000,
     shortfallPct: 1.1,
     collectHours: 0,

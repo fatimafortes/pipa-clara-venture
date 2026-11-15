@@ -459,3 +459,9 @@ Packet first (`8527b12`, `docs/PACKET.md`; Week 13 packet moved to `docs/PACKET-
 - **The real pricing conversation:** a fonda or tortillería, with the question on `/pricing`, no number in their mouth; then the pipero ("¿aceptarías que te paguen después de medir?"). Record exact words and each state in `lib/pricing-conversations.ts`.
 - Generate the mockup image from PACKET Appendix A → `docs/mockup-week14.png`.
 - Persona test (separate chat): fonda owner in Iztapalapa, from screenshots of `/pricing`; fix the worst confusion.
+
+## Week 14 — real pricing conversations (Nov 15)
+
+- **Fonda (Negocios, payer):** asked $20 → **said yes** ("$20 no se me hace mucho si de verdad funciona"); $50 only if a shortfall is shown. Not approved in writing, not paid. The first value he named was **planning** (how much water he has, when to order), not the shortfall. Normal month: **2 pipas of $1,500**, not 13.
+- **Pipero (not a payer):** accepts being paid after measuring "siempre y cuando sea una medición justa"; fears being paid less for a measurement error; wants the record of full deliveries.
+- **Changes:** both logged on `/pricing` (roles only, no names); Negocios defaults now use the measured numbers (2 per month, $1,500), labeled "medido con 1 fonda, n=1". The price rule (value ÷ 10 ≈ $2) is unchanged until the founder decides whether to test $20.

@@ -32,24 +32,28 @@ export type Conversation = {
 
 export const CONVERSATIONS: Conversation[] = [
   {
-    role: "Dueña o encargado de una fonda o tortillería que compró pipa privada este año",
+    role: "Encargado de una fonda familiar; compra pipa privada de 10,000 L y lleva las compras del local",
     segment: "Negocios",
-    date: null,
+    date: "2026-11-15",
     question:
-      "¿Qué valdría para ti saber exactamente cuántos litros entraron, y cuándo te vas a quedar sin agua? ¿Cuántas pipas compraste el mes pasado, sin crisis?",
-    priceAskedMxn: null,
-    answer: null,
-    whatItMeans: null,
-    states: ["planned"],
+      "¿Qué valdría para ti saber exactamente cuántos litros entraron, y cuándo te vas a quedar sin agua? ¿Pagarías $20 por pipa por eso? ¿Y $50?",
+    priceAskedMxn: 20,
+    answer:
+      "Sí me serviría bastante, sobre todo para organizarme. Así sabría cuánto agua tengo realmente y cuándo tengo que pedir otra pipa. […] Pues sí, $20 no se me hace mucho si de verdad funciona y me da esa información. […] Ahí ya lo pensaría un poquito más, pero si me demuestra que la pipa me está entregando menos agua de la que estoy pagando, sí los pagaría.",
+    whatItMeans:
+      "Dijo que sí a $20, diez veces el precio publicado, pero condicionado a que funcione; todavía no aprueba ni paga. Lo primero que nombró no fue el faltante sino organizarse: saber cuánta agua tiene y cuándo pedir otra pipa. En un mes normal compró 2 pipas de $1,500, no 13: el simulador ya usa esos números. A $50 solo paga si se demuestra un faltante, así que ese precio depende de las primeras pipas medidas.",
+    states: ["asked", "said_yes"],
   },
   {
-    role: "Pipero que entrega a cisternas compartidas",
+    role: "Chofer de pipa particular de 10,000 L; entrega a casas, comercios y vecindades",
     segment: "Familias",
-    date: null,
+    date: "2026-11-15",
     question: "¿Aceptarías que te paguen después de medir, por los litros que entraron?",
     priceAskedMxn: null,
-    answer: null,
-    whatItMeans: null,
-    states: ["planned"],
+    answer:
+      "Pues sí, siempre y cuando sea una medición justa. […] Me preocuparía que por un error de medición me quieran pagar menos. […] Si tengo fotos, horarios y registros de las entregas, sería una buena manera de respaldarme.",
+    whatItMeans:
+      "No es quien paga, pero acepta cobrar después de medir: ya le pagan casi siempre al terminar. Su miedo es el error de medición (cisternas de otras formas, fugas, alguien usando agua mientras descarga). Pipa Clara ya responde a eso: cada veredicto lleva su margen, un resultado dentro del margen cuenta como entrega completa y, si la bomba al tinaco estuvo prendida, no hay veredicto. Y quiere el registro de entregas completas: el pipero honesto como socio sí tiene interés.",
+    states: ["asked", "said_yes"],
   },
 ];
