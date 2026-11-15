@@ -64,7 +64,7 @@ flowchart TD
 ### 5.2 Swimlane: who does what with the money for one delivery
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph O[Organizer]
         O1[Orders pipa] --> O2[Takes before reading, plate photo]
         O3[Takes after reading] --> O4[Pays driver the pipa price]
