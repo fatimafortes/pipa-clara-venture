@@ -474,3 +474,85 @@ Packet first (`8527b12`, `docs/PACKET.md`, now `docs/PACKET-14.md`; Week 13 pack
 - **Fix (deployed):** the card now leads with "Hoy no cobramos: todavía estamos probando" (true: fee collection isn't active in the pilot), one price ("Después: $20 por pipa, aparte del agua"), what she gets, what she does ("2 fotos"), and the rule in plain words ("si no te ayudó, te bajamos el precio"). The honest math stays, folded under "Cómo calculamos este precio". The simulator's revenue/cost block is labeled "Números de Pipa Clara como negocio. No es lo que tú pagas." (she read "Arranque $984.50" as a setup fee).
 - **Honesty correction:** the persona's suggested copy promised "know when to order the next pipa". That isn't built (scope cut), so the card says it's coming and not ready.
 - **Open (from the persona log, not fixed yet):** no way to start from the page (WhatsApp button); the simulator opens on Familias even after she read the business card; "veredicto" and "margen" are opaque; the real quotes (fonda + chofer) that convinced her are at the very bottom; the chofer's card is labeled FAMILIAS; "(antes $2)" reads as "they raised it 10x".
+
+---
+
+# Week 15 — Distribution ("Juntar antes de pedir")
+
+Session 2026-11-22. Packet first (`b60dde3`, `docs/PACKET.md`; Week 14 packet moved to `docs/PACKET-14.md`, the one link to it updated), then code, one commit per feature.
+
+- **Local copy was 14 commits behind GitHub** (all of Week 14 lived only on `origin/main`). Fast-forwarded (`git pull --ff-only`, clean tree) before moving the packet, so `PACKET.md` → `PACKET-14.md` moved the right file.
+
+## Decisions (founder's, before code)
+
+- **A collection stores Pipa Clara's fee as $10 per pipa in total** (`pc_collections.fee_mxn`), not per household. Deliveries still store a per-household fee, which can't be exactly $10 for 6 households ($2 × 6 = $12). So a delivery registered from a collection carries `fee_total_mxn = 10`, and the verdict page, the WhatsApp summary and the "paid the pipero less" re-split use it.
+- **The homepage example uses a consistent verdict** (10,000 L claimed, 9,900 L measured, 300 L margin), so the page that speaks to the encargada doesn't open with a short load.
+
+## What was built
+
+- **F1 Collections** (`af3dd79`). Migration `supabase/migrations/20261122120000_pc_week15.sql`:
+  - `pc_collections` + `pc_collection_shares`, organizer-only RLS with the same parent-ownership check as the other tables; `anon` gets nothing.
+  - **The status is derived, never stored** (`lib/collection.ts`): collecting / ready / ordered. A stored status could go stale.
+  - **The database enforces the 100% rule too.** Restrictive policies (they narrow the existing `pc_deliveries` policies and don't change them):
+    - a pipa may point to a collection only if it is hers, on the same cistern, has shares, and every share is `received`;
+    - `pc_deliveries.collection_id` is `unique`, so a collection becomes a pipa once;
+    - shares are frozen once the pipa exists.
+  - A promise needs a date, and only a promise has one (CHECK).
+  - Screens:
+    - `/app/colecta/nueva` and `/app/colecta/[id]`: the list "Solo tú ves esta lista", "Ya dio su parte" / "Promete [fecha]" / "Deshacer", a greyed "Listo para pedir (falta N)" until 100%, "Registrar la pipa", and cancel while open.
+    - `/app` shows the open collection or "Nueva colecta"; "Nueva pipa sin colecta" keeps the old flow.
+  - Registering from a collection:
+    - the price comes from the collection, never from the form;
+    - the delivery's shares are copied with `paid = true`, so nobody is asked twice.
+  - After a short verdict, when she paid the pipero less, the delivery page lists the difference per household ("Te sobran $X… Tú decides: devolverlo o guardarlo"). Only she sees it, and nothing is stored as credit.
+- **F2 Progress message** (`141520e`, `lib/progress.ts`). Counts only; the function never receives labels. The agreed date is optional; at 100% the message says "Ya estamos todos: se pide la pipa." Date-only values are formatted at noon UTC so no time zone can move "viernes" to Thursday.
+- **F3 Homepage** (`bcf70ae`). Promise 3.1 as headline; example "6 de 6 pagaron → se pidió → se midió"; margin "2 cm por lectura (300 L en esta cisterna de 3 × 2.5 m)" labeled unverified. `ExampleBadge` is now amber, as BRAND says.
+- **F6 Texts** (`f8b7a7d`):
+  - `/product`: step 0, "nunca guarda dinero", who can file a challenge, photo notice.
+  - Simulator: the note "solo para hacer cuentas".
+  - `/privacidad`: collections, the opt-in's only use, and how to ask for deletion.
+- **F4 `/demo`** (`0aa9408`). Client-side stepper with fixed data (`lib/demo.ts`, tested against the same engine as the homepage numbers). No Supabase at all: `proxy.ts` returns early on `/demo` and sets `x-pc-demo`, so `AuthButton` renders a plain "Entrar" without reading the session. **Checked: 0 requests to Supabase** from the browser while walking the whole demo.
+- **F5 Opt-in** (`f3fdfc8`):
+  - Validation (`lib/optin.ts`):
+    - a 10-digit WhatsApp (also `+52`, `+52 1`) or an email, max 80 characters;
+    - housing from the fixed list;
+    - consent required;
+    - honeypot: a bot gets "Gracias" and nothing is stored.
+  - `pc_optins`: `anon`/`authenticated` may only INSERT; no select policy; CHECK `consent`. The insert has no `.select()`, because asking for the row back would fail.
+  - The founder reads opt-ins in the Supabase table editor.
+- **F7** (`0524e64`, `ec422f3`). Charter v2: the organizer collects first and orders only at 100%; new core concept "Collection"; v1 kept under History. `docs/BRAND.md` documents PACKET §3.3–3.4.
+- **F8** (`a926452`). `docs/content/`: empty templates (one per role hand-off for A1, finished A1 and B1, `approvals.md`, `tests.md` with 9 rows and "zeros count"). No content or results invented.
+- **RLS check** `supabase/checks/w15-rls-test.sql`: 19 checks with PASA/FALLA, rolled back at the end.
+
+## Mechanical pass
+
+- **Tests:** 121 passing (32 new), covering:
+  - shares for 3, 5, 12 and the mockup's 6 ($252 ×4, $251 ×2);
+  - "promised" ≠ received; ready only at 100%; ordered only once linked;
+  - the progress message never contains a label, an amount or a promise date;
+  - opt-in: empty consent, honeypot, bad phone/email, unknown housing.
+- **Types, lint and build:** clean.
+- **SQL, verified locally in PGlite** (all migrations + a stand-in for Supabase's `auth`/`storage`): `f3` 14/14, `w13` 14/14, `w15` 19/19 PASA, 0 rows left behind.
+  - **Proved the check can fail:** with the freeze policy dropped, RLS off on `pc_collections` and an anon select policy on `pc_optins`, 6 checks turned FALLA.
+- **Phone width 375 px** (headless Chrome): `/`, `/product`, `/pricing`, `/privacidad`, `/demo` (every step) with no horizontal scroll. On the opt-in, empty consent and a short phone are rejected, and the honeypot shows "Gracias" and the server logs "ignored".
+- **Bug found and fixed (phone check):** adding "Demo" to the header made "Cómo funciona" and "Por qué" break over two lines each at 375 px. "10,000 L" and "Casa 4" also broke in the middle ("10,000 / L", "Casa / 4"). Fix: nav links never break inside (`whitespace-nowrap`, wrapping whole links; "Demo" goes to a second row on small phones), and liters and labels don't break. Re-checked with screenshots.
+- **My own mistake, corrected:** the first Charter v2 history quoted the encargada in Spanish words I had translated myself. Replaced with the packet's recorded wording (`ec422f3`).
+- **Preview:** https://pipa-clara-venture-98gl2zoab-fatimafortes1.vercel.app (Ready). Deployed from a clean `git archive` of HEAD, so no untracked local files were uploaded. Previews are behind Vercel Deployment Protection, so the content was verified with `vercel curl`: home (promise + opt-in), `/demo` (badge), `/product` (step 0), `/privacidad` (opt-in).
+
+## What couldn't be done (yet)
+
+- **`docs/mockup-week15.png` is missing.** It isn't in `~/Downloads` or anywhere on this Mac, and it isn't among the recent Canva designs. The packet links to it; add it as `docs: week 15 mockup`.
+- **Migration and RLS check not run in "semestre"** (no access from here). Until the founder runs them:
+  - on the preview, collections fail for a signed-in user (tables missing);
+  - the opt-in shows an error code after a valid submit.
+  `/demo`, the homepage and the texts work now.
+- **Not pushed to GitHub.** A push to `main` deploys production; run the migration first, or production breaks too: `/app` and the delivery pages select the new `collection_id` / `fee_total_mxn` columns.
+- **Collection screens not exercised end to end against a real database.** The SQL is verified in PGlite, the screens by types and build, and the shared component by `/demo`. First thing after the migration: open a collection with 2 accounts, mark shares, register the pipa, try to register it twice.
+- **Persona pass with Rosa** (separate chat) and the **two real tests**: the founder's, in `docs/content/tests.md`.
+- **Next.js 16.4.3 has moderate advisories** (`npm audit`: cache disclosure / poisoning, fixed in 16.4.6). The build and dev server stop once to show this. Not upgraded this week; it's a separate decision.
+
+## Tomorrow's first move
+
+1. Run `20261122120000_pc_week15.sql` in "semestre", then `w15-rls-test.sql` with both accounts (expect 19/19 PASA).
+2. Walk a real collection on the preview with the second account; then push `main`.
+3. Add the mockup; start A1's six-role walkthrough in `docs/content/A1/`.
