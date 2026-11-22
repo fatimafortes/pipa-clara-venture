@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: "Pipa Clara",
   },
   description:
-    "Mide cuántos litros entraron de verdad a tu cisterna y reparte el costo de la pipa con pruebas, no con sospechas.",
+    "Ya no pongas dinero de tu bolsa: la pipa se pide cuando ya juntaron todos, y los litros se miden frente al pipero.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
