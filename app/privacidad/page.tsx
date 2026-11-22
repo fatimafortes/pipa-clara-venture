@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <p className="text-xl leading-relaxed text-muted">
           Pipa Clara guarda solo lo necesario para medir tu pipa y repartir el costo.
         </p>
-        <p className="text-sm text-muted">Actualizado el 8 de noviembre de 2026.</p>
+        <p className="text-sm text-muted">Actualizado el 22 de noviembre de 2026.</p>
       </section>
 
       <section className="space-y-3">
@@ -43,6 +43,14 @@ export default function PrivacyPage() {
             <strong>Pagos:</strong> qué hogar ya pagó su parte y cuánto le pagaste al pipero.
           </li>
           <li className="rounded-xl bg-white p-4 leading-relaxed">
+            <strong>Colectas:</strong> el precio, la cuota, la fecha que acordó el grupo y qué hogar ya dio
+            su parte o qué fecha prometió. Pipa Clara no recibe ni guarda dinero: solo lo anota.
+          </li>
+          <li className="rounded-xl bg-white p-4 leading-relaxed">
+            <strong>Si te apuntas a la prueba (&quot;Avísame&quot;):</strong> tu WhatsApp o tu correo, el tipo
+            de vivienda y que aceptaste que te contactemos. No necesitas cuenta.
+          </li>
+          <li className="rounded-xl bg-white p-4 leading-relaxed">
             <strong>Desacuerdos:</strong> quién no estuvo de acuerdo y la nota que escribiste.
           </li>
           <li className="rounded-xl bg-white p-4 leading-relaxed">
@@ -59,6 +67,10 @@ export default function PrivacyPage() {
           Para que puedas entrar, ver el resultado de cada pipa, saber cuánto paga cada hogar y
           tener las pruebas guardadas si alguien no está de acuerdo. El registro de acciones nos
           dice si la gente regresa a usar Pipa Clara y dónde se atora, para mejorarla.
+        </p>
+        <p className="leading-relaxed">
+          Si te apuntas a la prueba, usamos tu contacto <strong>solo</strong> para escribirte sobre esta prueba
+          de Pipa Clara. Nadie más lo ve: la página no puede leerlo, solo guardarlo.
         </p>
       </section>
 
@@ -121,8 +133,12 @@ export default function PrivacyPage() {
             {SUPPORT_EMAIL}
           </a>{" "}
           desde el correo con el que entras a Pipa Clara. Borramos tu cuenta y todo lo que guardaste:
-          cisterna, pipas, lecturas, fotos, pagos, desacuerdos y registro de acciones. Te avisamos
+          cisterna, pipas, colectas, lecturas, fotos, pagos, desacuerdos y registro de acciones. Te avisamos
           por correo cuando esté hecho.
+        </p>
+        <p className="leading-relaxed">
+          Si solo te apuntaste a la prueba, escribe al mismo correo con el
+          contacto que dejaste, y lo borramos.
         </p>
       </section>
     </div>

@@ -324,6 +324,9 @@ export function Simulator() {
 
       <section className="space-y-4 rounded-2xl border border-line bg-white p-5">
         <h3 className="text-xl font-bold">Guardar este escenario</h3>
+        <p className="text-base text-muted">
+          El simulador es solo para hacer cuentas: no guarda pipas ni pagos.
+        </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <input
             type="text"
