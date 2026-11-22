@@ -556,3 +556,19 @@ Session 2026-11-22. Packet first (`b60dde3`, `docs/PACKET.md`; Week 14 packet mo
 1. Run `20261122120000_pc_week15.sql` in "semestre", then `w15-rls-test.sql` with both accounts (expect 19/19 PASA).
 2. Walk a real collection on the preview with the second account; then push `main`.
 3. Start A1's six-role walkthrough in `docs/content/A1/`.
+
+## Week 15 — to production (2026-11-22)
+
+- **Founder ran the migration in "semestre"; `w15-rls-test.sql` with both real accounts: 19/19 PASA.**
+- **Login on the preview failed:** Supabase sent it back to `localhost:3000`. That's the known shared-project behavior from Week 12: the preview URL isn't in Redirect URLs, so Supabase falls back to the project's Site URL. Production is unaffected. Not changed: the Site URL belongs to another app.
+- **Pushed `main`** (`1810a21..37d8272`). The macOS keychain had a stale GitHub token; this push used `gh auth git-credential` for that one command only (no git config changed).
+- **Production checked** (`www.pipa-clara.site`, deployment Ready, aliases `www.pipa-clara.site` and `pipa-clara.site`):
+  - `/`, `/demo`, `/product`, `/privacidad`, `/pricing`, `/login` → 200; `/app` → 307 to `/login`; apex → 308 to `www`.
+  - New content is live: the home promise, the opt-in and "Probar la demo".
+  - `/demo` walked at 375 px through all five steps: no horizontal scroll, **0 requests to Supabase**, no page errors.
+  - **Login, up to Google:** "Entrar con Google" → Supabase `/auth/v1/authorize` with `redirect_to=https://www.pipa-clara.site/auth/callback` → Google's sign-in page. Not completed: that needs the founder's Google account.
+  - Observation: on a fresh browser, Google's email page says "to continue to `<project>.supabase.co`", not "Pipa Clara". No auth code changed this week. Week 13 recorded "Pipa Clara" on that screen, possibly on another step (account chooser or consent). To confirm on the founder's phone.
+- **Still pending, on production:**
+  1. The founder completes a Google sign-in and lands on `/app`.
+  2. The first real collection end to end: open one, mark shares, "Listo para pedir" only at 100%, register the pipa, then try to register it twice (expect "Esta colecta ya tiene su pipa registrada").
+  3. One real opt-in, to confirm the insert works, then delete that row in the table editor.
