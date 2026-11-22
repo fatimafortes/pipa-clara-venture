@@ -1,178 +1,200 @@
-# Pipa Clara — Build Packet (Week 14, Pricing)
+# Pipa Clara — Build Packet (Week 15, Distribution)
 
-**Founder:** Fátima Fortes Ortega · **Venture:** Pipa Clara · **Role this week:** Adversary
-**Inputs:** [`CHARTER.md`](CHARTER.md) · Week 13 packet [`PACKET-13.md`](PACKET-13.md) · [`DECISIONS.md`](DECISIONS.md) · Week 14 Brain Bending brief (Adversary) · Team 8 Blueprint, Week 14
-Written before any Week 14 code. No packet, no code.
+**Founder:** Fátima Fortes Ortega · **Venture:** Pipa Clara · **Role this week:** User
+**Inputs:** [`CHARTER.md`](CHARTER.md) · Week 14 packet [`PACKET-14.md`](PACKET-14.md) · [`DECISIONS.md`](DECISIONS.md) · [`PERSONAS.md`](PERSONAS.md) · Week 15 Brain Bending brief (User) and its full conversation · Team 8 Blueprint, Week 15
+Written before any Week 15 code. No packet, no code.
+
+Evidence labels used everywhere: **A** = a real person said it · **C** = my assumption · **n=** = how many people.
 
 ---
 
 ## 1. The problem, in my words
 
-Pipa Clara has a price on its form ($2 per household) that I picked so nobody would say no. That is the politeness price this week's provocation is about, and my own Brain Bending fight killed it: I could not say who it is for, how it reaches me, or why it is worth paying.
+My Brain Bending session moved my promise. Families told me problems with piperos are rare; the pain I actually heard is **late payments between neighbors**, and the person who absorbs it is the organizer. Today she often pays the pipero in full at the door and then chases each household for weeks (Charter v1 even describes it that way).
 
-This week the price has to tell the truth. Anyone, including me, must be able to see **who pays, how much, for what, compared with what they do today, and which numbers are measured and which are guesses.** The uncomfortable part is that most of the value rests on one number nobody has measured (how often a pipa delivers short), and on a margin of error that can be bigger than the shortfall it is supposed to catch. The site must show that, not hide it.
+So this week has two jobs. **Product:** make the promise true in the app, with the 100% rule: the pipa is ordered only when every household has given its share, and the organizer never covers anyone. **Distribution:** make Pipa Clara recognizable and useful to the right people with a small, auditable creative process, not a pile of posts. Every piece of content must show the product, carry its evidence label, and never accuse the pipero.
 
-## 2. The exact user, and who actually pays
+## 2. Audience, user and payer
 
-- **User:** the organizer, the person in a group of households sharing a cistern who orders the private pipa, pays the driver and keeps the record. Same person as Weeks 12–13. These are families who buy private pipas because the government pipa doesn't arrive when promised or when they need it.
-- **Who pays (Families tier):** the households, through their share. Pipa Clara's fee is **$10 per delivery**, added to the cost of the pipa and split in the same equal shares the organizer already collects (about $2 per household in a cistern of 5). Everyone sees the total before they commit.
-- **Who never pays:** the driver and the water company (the party measured cannot fund the measurement). The neighbors never pay anything separate and never need the app: they receive the WhatsApp summary free.
-- **Second segment:** small businesses that buy private pipas (fondas, tortillerías, laundries; car washes excluded). The business owner is user and payer.
+- **First user:** the **encargada** (organizer) who orders the shared private pipa and collects each household's share. One encargada told me collecting "becomes a disaster because they don't pay on time" (A, n=1). Separate-tank groups are included: whoever pays the pipero collects the money (A, n=2).
+- **Payer:** the **group**, $10 MXN per pipa, about $2 per household in a cistern of 5, inside the share she already collects. Pipa Clara never holds money.
+- **Moment:** the **collection window before ordering**, when the group waits for the last share. The "empty cistern" moment is still C.
+- **Not targeting yet:** households with free government pipas; piperos as customers (2027 hypothesis); buildings with an administrador (untested).
 
-## 3. Success definition
+## 3. Launch playbook
+
+### 3.1 Promise
+
+> **"Ya no pongas dinero de tu bolsa. La pipa se pide cuando ya juntaron todos, y tú ves quién falta. Los litros se miden frente al pipero: evidencia, no sentencia."**
+
+### 3.2 Claims register (what content may say)
+
+| Claim | Status | Source | May publish? |
+|---|---|---|---|
+| The pipa is ordered only when 100% is collected | Built this week (F1) | This packet | Yes, once deployed |
+| Pipa Clara never holds money | Design fact | Charter, app | Yes |
+| The group sees "5 de 6", never who | Built (Week 12) | App | Yes |
+| $10 per pipa per group | Decided (Week 14) | `/pricing` | Yes, with "hoy no cobramos en el piloto" |
+| Margin: 2 cm per reading (e.g. 160 L in a 2 × 2 m cistern) | Rule, **unverified in real cisterns** | `lib/verdict.ts` | Only with "aún no verificado" |
+| Late payments are the encargada's pain | A, n=1 | Brain conversation | Only as "una encargada nos dijo…" |
+| Families prefer paying the encargada in advance | **Untested** | — | **No** |
+| Any % of short loads or money saved | Not measured | — | **No** |
+| "Piperos roban / hacen trampa" | Contradicts Charter | — | **Never** |
+
+### 3.3 Brand voice
+
+A neighbor who explains, not a company that sells.
+1. **Tú**, short sentences, everyday words (the site already speaks this way).
+2. **Numbers carry their label** (medido / ejemplo / aún no verificado). If a claim isn't in the register, it doesn't ship.
+3. **Never blame the pipero, never expose a household.** No names, no faces, no plates.
+4. **No pressure:** no countdowns, no "últimos lugares", no invented waiting lists.
+
+### 3.4 Visual system (from `app/globals.css`, documented in `docs/BRAND.md` this week)
+
+| Token | Value | Use |
+|---|---|---|
+| Teal | `#12707a` (dark `#0c565e`, soft `#e2f0f1`) | Actions, headings, the brand |
+| Amber | `#b45f06` (soft `#fdf3e3`) | Warnings, "faltante", labels like DATOS DE EJEMPLO |
+| WhatsApp green | `#1f9150` | Only for WhatsApp buttons |
+| Ink / muted / line / page | `#16272b` / `#55666a` / `#dbe5e7` / `#f2f6f7` | Text, secondary text, borders, background |
+| Type | Inter, base 112.5% | Large and readable: Rosa is 55 and reads on her phone |
+| Shapes | Rounded cards, flat, one idea per card | Same in content pieces |
+
+## 4. The creative process (separate AI chats, human approval)
+
+Each role is a separate chat with only its input. The founder approves before anything is shown to a real person. Every hand-off is saved in `docs/content/` as process evidence.
+
+| # | Role | Input | Output | Quality check |
+|---|---|---|---|---|
+| 1 | Research | Concept + my evidence (A/C labels) | 3 findings, each with a source or a C label | Every finding traceable to a person or a page |
+| 2 | Writing | Findings + voice rules (3.3) | Copy (≤ 40 words for WhatsApp) | Sounds like a neighbor; understandable without me |
+| 3 | Visual | Copy + visual system (3.4) | Image or screen, via Canva | Uses the palette; no real faces, plates or names |
+| 4 | Claim check | Piece + claims register (3.2) | Pass / fail list | Nothing outside the register; nothing blames the pipero; nobody exposed |
+| 5 | Style review | Piece + 3.3 + 3.4 | Fixes | Consistent voice and look |
+| 6 | Revision | Fail list | Corrected piece | Every failure closed |
+| — | **Founder** | Final piece | ✅ / ❌ + written reason | My call, logged in `docs/content/approvals.md` |
+
+**Walkthrough piece:** A1 below, run through all six roles, with what each role handed on and what I rejected.
+
+## 5. Six concepts, three series
+
+| Series | Concept | Format | Status |
+|---|---|---|---|
+| **A · Cuentas claras** (for the encargada) | **A1 "Ya no pongas de tu bolsa"**: a WhatsApp message an encargada can read and forward | WhatsApp text | **Finish + test** (walkthrough piece) |
+| | A2 "Juntando: 5 de 6": the new progress message, shown from `/demo` | Screenshot | Concept |
+| **B · Litros a la vista** (measurement as evidence) | **B1 "¿Cómo mido?"**: the in-app guide turned into a shareable card | Image (Canva) | **Finish** |
+| | B2 "Evidencia, no sentencia": what happens when there's a difference, for honest piperos | Short video | Concept |
+| **C · Lo que nos dijeron** (honest evidence) | C1 What one encargada told us, anonymous and with her permission | Image | Concept |
+| | C2 "Lo que todavía no sabemos": my untested list, in public | Web section | Concept |
+| — | **Venture page with opt-in** (home + "Avísame") | Web | **Finish + test** |
+
+**Three finished assets in three formats:** A1 (text), B1 (image), venture page with opt-in (web).
+**Two tests:**
+1. **A1 → the real encargada.** Ask: "¿Se lo mandarías a tu grupo? ¿Qué cambiarías?" Write down her exact words.
+2. **Venture page → 9 people from my sample** (5 buyers + 4 vecindad neighbors) via WhatsApp. Count opt-ins after 72 h. **Zero responses is valid evidence** and gets reported as zero.
+
+## 6. Success definition
 
 **Before the module closes, at www.pipa-clara.site:**
+- **"Juntar antes de pedir" works in the app:** the organizer opens a collection, marks each household's share as received, and the app says **"Listo para pedir"** only at 100%. The group's WhatsApp progress message shows counts, never names.
+- **The homepage speaks to the encargada** with the promise in 3.1, and the example shows payment **before** delivery.
+- **`/demo` is public:** the whole flow with example data, no login, no database writes, labeled "DEMO · datos de ejemplo".
+- **Opt-in works:** "¿Organizas la pipa de tu vecindad o edificio?", with explicit consent, stored safely.
+- **The packet shows the process:** the walkthrough for A1, 3 finished assets, 2 tests with real results (or real zeros).
 
-- **`/pricing` is live** with 3 tiers (Vecinos free, Familias $10 per delivery, Negocios priced from data), 2 segments, and the free-vs-paid line explained.
-- **The simulator works:** users, conversion, deliveries per month and price → monthly and annual revenue, cost to serve and margin; plus the value ratio per payer and whether the expected shortfall is even detectable with the cistern's margin of error. **Every assumption is visible and labeled measured / assumed / analogy.** Scenarios can be **saved** and **shared by link**.
-- **`/about` holds the 10:1 memo,** built from the same numbers as the simulator (one source file), with the honest result even where it misses 10:1.
-- **The real pricing conversation is logged on `/pricing`,** with asked / said yes / approved in writing / paid / renewed as separate states. A "no" counts as evidence.
-- **The delivery form defaults to the new price** ($10 per delivery split among households).
+## 7. Mockup
 
-## 4. Mockup
+![Pipa Clara "Juntar antes de pedir", Week 15 mockup](mockup-week15.png)
 
-![Pipa Clara pricing simulator, Week 14 mockup](mockup-week14.png)
+*Generated with Canva from the screen description in Appendix A, using the Week 13–14 mockups as style reference. Example data, labeled on screen.*
 
-*Generated with Canva image generation from the screen description in Appendix A, using the Week 13 mockup as style reference. Example data, labeled on screen.*
-
-## 5. How the feature works
-
-### 5.1 Flowchart: from assumptions to price, ratio and detectability
+## 8. How the feature works
 
 ```mermaid
 flowchart TD
-    A[Visitor opens /pricing] --> B[Picks segment: Familias or Negocios]
-    B --> C[Defaults load from lib/pricing.ts<br/>each tagged measured / assumed / analogy]
-    C --> D[Visitor edits inputs]
-    D --> E["Revenue = cisterns × conversion × deliveries/month × price"]
-    D --> F["Cost to serve = setup + support minutes × hourly value"]
-    E --> G[Monthly and annual revenue, margin]
-    F --> G
-    D --> H["Value per delivery = time saved × wage + shortfall % × pipa cost"]
-    H --> I["Ratio = value ÷ price<br/>for the group and for each household"]
-    I --> J{Ratio ≥ 10?}
-    J -- Yes --> J1[Shows 'se sostiene 10:1']
-    J -- No --> J2[Shows the real ratio and what would have to be true]
-    D --> K["Margin (L) = 2 × error cm × liters per cm"]
-    K --> L{"Expected shortfall (L) > margin?"}
-    L -- No --> L1["Warning: a typical shortfall can't be detected with this margin"]
-    L -- Yes --> L2[Detectable]
-    G --> M{Save?}
-    M -- Save --> N[Scenario stored in this browser + shareable link]
+    A[Organizer: Nueva colecta] --> B[Price the pipero asks + $10 Pipa Clara<br/>split in equal shares]
+    B --> C[Optional: date the group agreed]
+    C --> D[Households give their share to the organizer, in cash, as today]
+    D --> E[Organizer marks each share as received<br/>or as 'promised for a date']
+    E --> F{All shares received?}
+    F -- No --> G[App: 'Faltan 1 de 6'<br/>WhatsApp progress: counts only]
+    G --> D
+    F -- Yes --> H[App: 'Listo para pedir']
+    H --> I[Organizer orders the pipa]
+    I --> J[Existing flow: before reading, after reading, verdict]
+    J --> K{Verdict short and she paid the pipero less?}
+    K -- Yes --> L[App shows the difference per household<br/>she decides: return it or keep it for the next pipa]
+    K -- No --> M[Done: summary by WhatsApp]
 ```
 
-### 5.2 Swimlane: who does what with the money for one delivery
+**Who holds the money:** the organizer, in cash, as today. Pipa Clara only records it. Nobody is ever excluded from water: the pipa waits for everyone, and the date is the group's decision, not the app's.
 
-```mermaid
-flowchart TB
-    subgraph O[Organizer]
-        O1[Orders pipa] --> O2[Takes before reading, plate photo]
-        O3[Takes after reading] --> O4[Pays driver the pipa price]
-        O5[Marks each share paid] --> O6[Keeps the $10 fee aside]
-        O6 --> O7[Transfers fees to Pipa Clara monthly<br/>NOT ACTIVE in pilot]
-    end
-    subgraph H[Households]
-        H1[See total incl. $10 before committing] --> H2[Pay their share to the organizer]
-    end
-    subgraph D[Pipero]
-        D1[Delivers, invited to witness] --> D2[Receives pipa price only]
-    end
-    subgraph P[Pipa Clara]
-        P1[Verdict with margin] --> P2[Splits pipa + $10 in equal shares]
-        P2 --> P3[WhatsApp summary, free for neighbors]
-    end
-    O2 --> D1 --> O3 --> P1
-    P2 --> H1
-    H2 --> O5
-    O4 --> D2
-```
-
-The fee never passes through the pipero's hands (Brain Bending, open Kill #2).
-
-## 6. What I build this week
+## 9. What I build this week
 
 | # | Feature | Acceptance |
 |---|---|---|
-| P1 | **`lib/pricing.ts`**: one source for every assumption and the pure math | Each assumption has value, unit, status (`measured` / `assumed` / `analogy`) and source; functions for revenue, cost to serve, value per delivery, ratios, detectability; unit tests |
-| P2 | **`/pricing` page**: tiers, segments, free-vs-paid line, shadow clause | 3 tiers, 2 segments; header link "Precios" |
-| P3 | **Simulator** (client component) | Inputs → outputs update live; assumptions labeled; "SIMULACIÓN" badge; validation (ranges, numbers only) |
-| P4 | **Saved scenarios** | Save with a name in this browser (`localStorage`, try/catch, works without it); "Copiar enlace" encodes inputs in the URL; opening the link restores them; no personal data |
-| P5 | **10:1 memo on `/about`** | Today's workflow vs Pipa Clara, same task (one delivery) and period; money + time + risk; measured vs assumed; ratio per payer; reads its numbers from `lib/pricing.ts` |
-| P6 | **Pricing conversation log** on `/pricing` | Entries from `lib/pricing-conversations.ts` with separate states; the pending conversation shows the exact question |
-| P7 | **Form default = new price** | "Nueva pipa" fee default per household = `max(1, round(10 / households))` (5 → $2, 3 → $3, 12 → $1); label explains "$10 por pipa, repartido" |
-
-## 7. The pricing math (pure, checkable by hand)
-
-- **Revenue/month** = cisterns reached × conversion × deliveries per month × price.
-- **Cost to serve/month** = (new cisterns × setup min + active cisterns × support min) ÷ 60 × founder hourly value. Hosting $0 (free tiers).
-- **Value per delivery** = max(0, collection hours − measuring hours) × hourly wage (Families only; a business has no shares to collect) + shortfall rate × pipa price.
-- **Ratios:** group = value ÷ price. Each household = (shortfall value ÷ households) ÷ (price ÷ households) = shortfall value ÷ price, the honest number the Adversary found (about 2:1).
-- **Price at 10:1** = value ÷ 10 (used for the Negocios tier).
-- **Detectability:** margin L = 2 × error cm × length × width × 10 (same as `computeVerdict()`); expected shortfall L = rate × liters claimed. Not detectable when shortfall ≤ margin.
-- **Worked example (defaults):** pipa $1,800, 10,000 L, 1.1% shortfall → $19.80; 1.5 h collecting − 10 min measuring = 1.33 h × $39.38 = $52.51; value $72.31 → **7.2:1 at $10, not 10:1.** Cistern 3 × 2.5 m, 2 cm error → 75 L/cm → margin 300 L; expected shortfall 110 L → **not detectable.** The site says both.
-
-## 8. Benchmark line
-
-- **The best existing solution on Earth for this is** LP gas in stationary tanks in Mexico: the household checks the tank's level against the liters charged, backed by a meter Profeco regulates.
-- **Mine localizes it by** giving water pipas the same before/after check with no regulated meter, so every verdict declares its own margin of error, and its price is set by what that check is worth to the family that buys out of necessity.
-
-## 9. The long view
-
-If this slice works, Pipa Clara has a price it can defend and a simulator that updates itself as real deliveries replace the gasoline analogy. In three years the fee from families and businesses that buy regularly pays for the measurement, and a measured shortfall rate is the number that tells water companies and regulators whether pipa water needs a meter like LP gas. The load-bearing walls this week are that every assumption is labeled, the fee never touches the pipero, and payment never changes a verdict.
+| F1 | **Collections ("Juntar antes de pedir")** | New `pc_collections` + `pc_collection_shares` (organizer-only RLS, `pc_` prefix, nothing else in the shared project touched). Organizer creates a collection from her cistern (asked price, $10 fee, optional agreed date), marks shares received or "promised for [date]"; status `collecting → ready → ordered`; "Listo para pedir" only at 100%; "Registrar la pipa" links the collection to the new delivery so shares aren't collected twice |
+| F2 | **Progress message by WhatsApp** | "Pipa Clara · Juntando para la pipa: 5 de 6 ya dieron su parte. Fecha que acordó el grupo: viernes. Cuando estemos todos, se pide." Counts only, never labels; pure function + tests like `lib/summary.ts` |
+| F3 | **Homepage for the encargada** | Headline = promise 3.1; example re-ordered: "6 de 6 pagaron → se pidió → se midió"; margin written as "2 cm por lectura (300 L en esta cisterna de 3 × 2.5 m)"; "Lo que nunca cambia" keeps its three cards |
+| F4 | **`/demo`** | Public, linked from home and header; walks collection → ready → readings → verdict → summary with fixed example data; no auth, no Supabase calls; every screen badged "DEMO · datos de ejemplo"; no real photos |
+| F5 | **Opt-in on home** | Fields: WhatsApp or email (one required), housing type (vecindad / edificio / privada / otra), required consent checkbox "Acepto que Pipa Clara me contacte sobre esta prueba"; new `pc_optins` (anon may insert only; nobody anonymous may read); success: "Gracias. Te escribimos cuando haya lugar para tu grupo." No countdowns, no fake counts |
+| F6 | **"Cómo funciona" + Precios text** | New step 0 "Junten antes de pedir"; "Pipa Clara nunca guarda dinero"; who can file a challenge (pipero, neighbor, organizer) and that a difference is evidence, not a sentence; photo notice: the pipero is told when and why a photo is taken, photos are never published; under "Guardar este escenario": "El simulador es solo para hacer cuentas: no guarda pipas ni pagos." |
+| F7 | **Charter v2 + `docs/BRAND.md`** | Charter user line updated to the 100% rule (v1 kept in history); BRAND.md documents 3.3 and 3.4 |
+| F8 | **Content process evidence** | `docs/content/` with one file per role hand-off for A1, the finished A1 and B1, `approvals.md`, and test results |
 
 ## 10. Scope cut: what I am NOT building this week
 
-- No payment processing or fee collection (no Clip, no transfers): the monthly transfer is shown as **not active in the pilot**.
-- No change to the database or the payment flow (families still pay their share to the organizer); "pay at the door after the after reading" from Brain Bending is a later change.
-- No business accounts or business-specific screens; the Negocios tier lives on `/pricing` and in the simulator only.
-- No scenarios stored in Supabase (no auth needed, no personal data).
-- No run-out prediction (needs readings between deliveries; Rotoplas already sells that sensor).
+- No payment processing: money stays in cash with the organizer.
+- No credit or debt system: a difference after a short verdict is shown, and she decides.
+- No automatic reminders or messages to households: she sends the WhatsApp progress herself.
+- No public social account and no ten-post quota.
+- No measurement change: the 2 cm margin stays labeled unverified until I measure real cisterns.
 
 ## 11. Architecture and stack
 
-Same stack as Week 13; only additions are listed.
-
 | Layer | Choice | Change this week |
 |---|---|---|
-| Frontend | Next.js 16 (App Router) + React + Tailwind | `/pricing` page, simulator client component, `/about` memo |
+| Frontend | Next.js 16 (App Router) + React + Tailwind | Collection screens, `/demo`, homepage, opt-in form |
 | Hosting | Vercel, **www.pipa-clara.site** | — |
-| Auth / DB | Supabase (Google sign-in, RLS) | **None** |
-| Logic | Pure functions | **New:** `lib/pricing.ts` (+ tests); `lib/pricing-conversations.ts` (data) |
-| Storage | — | Saved scenarios in `localStorage` (per browser) + URL query for sharing |
+| Auth / DB | Supabase (Google sign-in, RLS), shared project | **New:** `pc_collections`, `pc_collection_shares` (organizer-only), `pc_optins` (anon insert-only) |
+| Logic | Pure functions | **New:** collection status + progress message (+ tests) |
+| Content | Canva (connected), separate AI chats | B1 card, mockup |
 
 ## 12. Security floor (checked before building)
 
-1. **No secrets:** nothing new.
-2. **Auth:** `/pricing` and `/about` are public and store nothing personal; the app stays behind Google sign-in.
-3. **RLS:** no new tables.
-4. **Validation:** every simulator input clamped to a range and parsed as a number; scenario names max 40 characters; URL parameters parsed the same way, unknown keys ignored.
-5. **No real personal data:** the conversation log records role and segment, never names or phone numbers; simulated numbers labeled "SIMULACIÓN".
+1. **No secrets:** nothing new; anon key only on the client.
+2. **RLS:** collections and their shares are readable and writable only by their organizer; `pc_optins` accepts anonymous inserts and has no select policy for anon. Tested with an RLS check like `supabase/checks/`.
+3. **Validation:** opt-in contact max 80 characters, email or 10-digit phone format, housing type from a fixed list, consent must be true, a hidden honeypot field rejects bots; collection amounts are integers within the delivery ranges.
+4. **`/demo` touches no database** and shows no real photos or names.
+5. **Personal data:** opt-ins are used only to contact that person about the pilot; `/privacidad` says so and how to ask for deletion.
 
 ## 13. Test plan
 
 **Mechanical pass**
-
-- `lib/pricing.ts`: worked example above (7.2:1, 300 L margin, not detectable); value never negative when measuring takes longer than collecting; business value has no time component; price at 10:1; revenue/cost with 0 conversion; URL encode → decode round trip; out-of-range values clamped.
-- Pages: `/pricing` and `/about` render on phone width with no horizontal scroll; saving works and survives reload; saving with storage blocked shows a message, not a crash; a shared link restores the scenario in a private window.
-- Delivery form: default fee for 3, 5 and 12 households.
+- Collection math: shares for 3, 5 and 12 households; status is `ready` only when every share is received; "promised" doesn't count as received; linking to a delivery happens once.
+- Progress message: counts only, no labels, agreed date optional.
+- RLS: another user can't read a collection; anon can insert an opt-in but can't select.
+- Pages: home, `/demo`, opt-in on phone width with no horizontal scroll; opt-in rejects empty consent and the honeypot.
 - Types, lint, tests, build. Find at least one bug, fix it, redeploy, log it.
 
-**Persona pass (Layer 1, separate chat)**
+**Persona pass (separate chat)**
+- Rosa (PERSONAS.md) walks the collection screens from phone screenshots: does she understand "Listo para pedir", and would she send the progress message to her group? Log every confusion; fix the worst.
 
-- A fonda owner in Iztapalapa who buys private pipas several times a week in dry months, uses WhatsApp, distrusts apps and reads numbers carefully. She walks `/pricing` from screenshots and says whether she understands what she would pay and why. Log every confusion; fix the worst.
+**Real tests** (section 5): A1 with the encargada; the venture page with 9 people. Results go in `docs/content/tests.md`, including zeros.
 
-## 14. Blueprint conditions honored (Team 8, Week 14)
+## 14. Blueprint conditions honored (Team 8, Week 15)
 
 | Condition | How |
 |---|---|
-| 1. User and budget owner identified; total price and scope disclosed | Each tier names user and payer; $10 shown inside the delivery total before households commit |
-| 2. Quote request, written approval, payment, renewal logged separately; simulated labeled | Conversation log with separate states; simulator badge "SIMULACIÓN" |
-| 3. Compare with the current workflow; verified benefit ÷ total cost vs 10:1 | 10:1 memo: notebook + cash collection vs Pipa Clara, same delivery; ratio shown even when below 10 |
-| 4. Track setup, support and delivery costs incl. founder labor | Cost to serve in the simulator: setup and support minutes × hourly value |
-| 5. Shadow clause | Payment buys the service, never a different verdict; evidence and margin always visible; disagreements never deleted; the fee never passes through the pipero |
+| 1. Shadow clause: no claim outruns its evidence | Claims register (3.2); every public number labeled; claim check is a required role |
+| 2. The weakest party's data is never used against them | Nobody excluded from water; group sees counts only; no names, faces or plates in content |
+| 3. A dashboard never closes what the affected person hasn't confirmed | A difference is evidence, not a sentence; challenges never deleted; "Listo para pedir" requires every share |
+| 4. Beat the current workaround or recommend it | Test A1 against today's WhatsApp + cash; if the encargada prefers her current way, I report it |
+| 5. No artificial scarcity, no overload | No countdowns or invented lists in the opt-in; I contact only as many groups as I can support |
+| 6. Name the payer before any revenue claim | The group pays $10 per pipa; no fee is collected in the pilot; friends' opt-ins don't count as validation |
 
 ---
 
 ## Appendix A: mockup screen description
 
-> Mobile screen, Spanish UI, app "Pipa Clara" (water-drop logo, teal and white), amber badge "SIMULACIÓN". Title "¿Cuánto vale Pipa Clara?". Two tabs: "Familias" (selected) and "Negocios". Input rows with small grey tags: "Precio de la pipa $1,800 · medido", "Faltante esperado 1.1% · analogía gasolina, sin validar", "Horas cobrando 1.5 · supuesto", "Cuota Pipa Clara $10 por pipa". A large result card: "Valor por pipa: $72 · Precio: $10 · 7.2 a 1" with an amber note "Todavía no llega a 10 a 1". Below, an amber box: "Con un margen de 300 L, un faltante de 110 L no se puede detectar." Bottom: "Ingresos al mes: $1,200 · al año: $14,400" and buttons "Guardar escenario" and "Copiar enlace". Large readable text, flat, no clutter.
+> Mobile screen, Spanish UI, app "Pipa Clara" (water-drop logo, teal #12707a and white, Inter font, large text, rounded cards, flat). Small amber badge "DATOS DE EJEMPLO". Title "Juntando para la pipa". Card: "Pipa de 10,000 L · $1,500 + $10 Pipa Clara · Cada hogar: $252". A big progress bar in teal, 5 of 6 filled, with "5 de 6 ya dieron su parte". Below, a list visible only to the organizer, with a small lock icon and the note "Solo tú ves esta lista": "Casa 1 ✓", "Casa 2 ✓", "Casa 3 ✓", "Casa 4 · promete el viernes", "Casa 5 ✓", "Casa 6 ✓". A soft teal line: "Fecha que acordó el grupo: viernes". A greyed-out button "Listo para pedir (faltan 1)". A green WhatsApp button "Mandar avance al grupo". Bottom note in small grey text: "Pipa Clara nunca guarda dinero: tú cobras como siempre."

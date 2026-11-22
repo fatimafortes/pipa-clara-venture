@@ -1,6 +1,6 @@
 # Implementation prompt — Week 14 (Pricing)
 
-Source: [`PACKET.md`](PACKET.md) (Week 14). Build in this order; one commit per feature; run `npm run lint`, `npm test` and `npm run build` before each push. Read `node_modules/next/dist/docs/` before touching routing (Next.js 16).
+Source: [`PACKET-14.md`](PACKET-14.md) (Week 14). Build in this order; one commit per feature; run `npm run lint`, `npm test` and `npm run build` before each push. Read `node_modules/next/dist/docs/` before touching routing (Next.js 16).
 
 ## Rules
 

@@ -427,7 +427,7 @@ Every decision, bug and fix, in the order they happened. Newest session at the b
 
 # Week 14 — Pricing
 
-Packet first (`8527b12`, `docs/PACKET.md`; Week 13 packet moved to `docs/PACKET-13.md`), then the implementation prompt (`docs/implementation-prompt-week14.md`), then code.
+Packet first (`8527b12`, `docs/PACKET.md`, now `docs/PACKET-14.md`; Week 13 packet moved to `docs/PACKET-13.md`), then the implementation prompt (`docs/implementation-prompt-week14.md`), then code.
 
 ## Decisions (founder's)
 
