@@ -1,7 +1,7 @@
 # Pipa Clara — Product Charter
 
 **Founder:** Fátima Fortes Ortega · **Venture weeks:** 12–17 · **Source ship:** Week 11, *Dreaming of Plenitude*
-**Version:** v1 (Week 12) — written before the rebuild. This charter is the referee for every scope decision.
+**Version:** v2 (Week 15) — the organizer line now follows the 100% rule. v1 (Week 12) is kept under [History](#history). This charter is the referee for every scope decision.
 
 > **The product in one line:** households that share a cistern check how much water a truck actually delivered (the liters the driver claims vs. the liters that entered the cistern) and split the cost on evidence instead of suspicion.
 
@@ -13,7 +13,7 @@ In three years, Pipa Clara is how any place that buys water by truck knows what 
 
 ## USERS
 
-**Primary user: the organizer.** In a group of households that share a cistern, one person orders the water truck, pays the driver in full at the door (cash or transfer), keeps the record, and collects each household's share afterwards. She is the one who measures, registers the delivery and sends the summary to her neighbors. The app is useless to anyone who isn't keeping the record, so it is built for her.
+**Primary user: the organizer.** In a group of households that share a cistern, one person collects each household's share, orders the water truck **only when every household has given its share** (the 100% rule), pays the driver, keeps the record, measures, registers the delivery and sends the summary to her neighbors. She never covers anyone from her own pocket. Pipa Clara never holds money: she collects in cash, as today, and the app only records it. Nobody is ever excluded from water: the pipa waits for everyone, and the date is the group's decision, not the app's. Separate-tank groups are included: whoever pays the driver collects the money. The app is useless to anyone who isn't keeping the record, so it is built for her.
 
 **Secondary: the neighbors.** They don't open the app. They receive the summary (liters claimed vs. measured, their share, how many households have paid) and pay the organizer.
 
@@ -48,7 +48,8 @@ Short loads are rare, so the measurement only matters if it is still happening t
 
 If a feature doesn't speak these nouns, it doesn't belong in Pipa Clara.
 
-- **Organizer:** the person who orders the truck, pays the driver, keeps the record and collects each household's share.
+- **Organizer:** the person who collects each household's share, orders the truck once everyone has paid, pays the driver and keeps the record.
+- **Collection:** the shares gathered before ordering a delivery; the delivery is ordered only when every share is received (a promise doesn't count). The group sees how many have given, never who.
 - **Household:** one of the homes that share the cistern and split the cost.
 - **Cistern:** the shared tank, defined by its dimensions; every centimeter of level equals its floor area × 10 liters.
 - **Delivery:** one water truck arrival, with the liters the driver claims and the price paid.
@@ -56,3 +57,15 @@ If a feature doesn't speak these nouns, it doesn't belong in Pipa Clara.
 - **Verdict:** the result of comparing claimed vs. measured liters: consistent, short, or couldn't measure.
 - **Challenge:** a dispute about a verdict, recorded next to it, never deleted.
 - **Share:** what each household owes for a delivery, and whether it has been paid (visible to the organizer only; the group sees a count).
+
+---
+
+## History
+
+### v1 (Week 12) — primary user, as first written
+
+> **Primary user: the organizer.** In a group of households that share a cistern, one person orders the water truck, pays the driver in full at the door (cash or transfer), keeps the record, and collects each household's share afterwards. She is the one who measures, registers the delivery and sends the summary to her neighbors. The app is useless to anyone who isn't keeping the record, so it is built for her.
+
+**Why it changed (Week 15):** in the Week 15 Brain Bending session, families said problems with piperos are rare; the pain I actually heard is late payments between neighbors, absorbed by the organizer who pays first and chases each household for weeks ("se vuelve un desastre porque no pagan a tiempo", one encargada, A, n=1). v1 described that workaround as the normal flow. v2 makes the 100% rule part of who she is in the product. See `docs/PACKET.md` §1–2.
+
+*Not changed in v2:* the price lines under "Who pays" still show the Week 12 pilot price; the decision that replaced them ($10 per pipa for families, not collected in the pilot) is in `docs/DECISIONS.md`, Week 14.
