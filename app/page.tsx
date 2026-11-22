@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ExampleBadge } from "@/components/ExampleBadge";
+import { OptInForm } from "@/components/OptInForm";
 
 // Week 15: the homepage speaks to the encargada (PACKET §3.1, F3). The example shows
 // payment BEFORE delivery: 6 de 6 pagaron → se pidió → se midió.
@@ -76,6 +77,21 @@ export default function HomePage() {
         <span className="inline-block rounded-full bg-teal-soft px-4 py-2 font-semibold text-teal">
           Ya pagaron: 6 de 6, antes de pedir
         </span>
+      </section>
+
+      <section id="avisame" className="scroll-mt-4 space-y-4 rounded-2xl border border-line bg-teal-soft p-5">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold">¿Organizas la pipa de tu vecindad o edificio?</h2>
+          <p className="text-lg">
+            Estamos probando Pipa Clara con pocos grupos, para poder acompañar a cada uno. Déjanos tu contacto y
+            te escribimos.
+          </p>
+        </div>
+        <OptInForm />
+        <p className="text-base text-muted">
+          Más en <Link href="/privacidad" className="font-semibold text-teal underline">Privacidad</Link>, también cómo
+          pedir que borremos tu contacto.
+        </p>
       </section>
 
       <section className="space-y-4">
