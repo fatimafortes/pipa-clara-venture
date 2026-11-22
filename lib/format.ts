@@ -41,3 +41,20 @@ export function formatTime(iso: string): string {
     timeZone: TIME_ZONE,
   }).format(new Date(iso));
 }
+
+// A date the group agreed ("YYYY-MM-DD", no time): "viernes 28 de noviembre".
+// Read at noon UTC, so no time zone can move it to the day before.
+export function formatDateOnly(date: string): string {
+  return new Intl.DateTimeFormat("es-MX", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T12:00:00Z`));
+}
+
+export function isDateOnly(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const d = new Date(`${value}T12:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
+}
