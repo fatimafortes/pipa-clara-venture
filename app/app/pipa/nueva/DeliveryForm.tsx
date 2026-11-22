@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Checkbox, Field, FormError, SubmitErrors } from "@/components/Field";
 import { MeasureGuide } from "@/components/MeasureGuide";
+import { formatMxn } from "@/lib/format";
 import { FAMILY_FEE_PER_DELIVERY, defaultFeePerHousehold } from "@/lib/pricing";
 import { createDelivery, type DeliveryFormState } from "../actions";
 import { PhotoField } from "./PhotoField";
@@ -14,11 +15,14 @@ export function DeliveryForm({
   maxHeightCm,
   households,
   firstDelivery,
+  fromCollection,
 }: {
   userId: string;
   maxHeightCm: number;
   households: number;
   firstDelivery: boolean;
+  // Registered from a ready collection: the price and fee were already collected
+  fromCollection: { id: string; priceMxn: number; feeMxn: number } | null;
 }) {
   const [state, action, pending] = useActionState(createDelivery, initialState);
   const [uploads, setUploads] = useState(0);
@@ -41,22 +45,35 @@ export function DeliveryForm({
           defaultValue={v.litersClaimed}
           error={state.errors.litersClaimed}
         />
-        <Field
-          label="Precio que pide el pipero ($)"
-          name="priceMxn"
-          inputMode="numeric"
-          placeholder="ej. 1800"
-          defaultValue={v.priceMxn}
-          error={state.errors.priceMxn}
-        />
-        <Field
-          label="Cuota de Pipa Clara por hogar ($)"
-          hint={`$${FAMILY_FEE_PER_DELIVERY} por pipa, repartidos entre ${households} hogares.`}
-          name="feeMxn"
-          inputMode="numeric"
-          defaultValue={v.feeMxn ?? String(defaultFeePerHousehold(households))}
-          error={state.errors.feeMxn}
-        />
+        {fromCollection ? (
+          <div className="rounded-xl bg-teal-soft p-4 text-lg">
+            <input type="hidden" name="collectionId" value={fromCollection.id} />
+            <p className="font-semibold">Ya juntaron todos</p>
+            <p>
+              Precio del pipero: {formatMxn(fromCollection.priceMxn)} + {formatMxn(fromCollection.feeMxn)} Pipa Clara. Las
+              partes ya se cobraron: no se vuelven a cobrar.
+            </p>
+          </div>
+        ) : (
+          <>
+          <Field
+            label="Precio que pide el pipero ($)"
+            name="priceMxn"
+            inputMode="numeric"
+            placeholder="ej. 1800"
+            defaultValue={v.priceMxn}
+            error={state.errors.priceMxn}
+          />
+          <Field
+            label="Cuota de Pipa Clara por hogar ($)"
+            hint={`$${FAMILY_FEE_PER_DELIVERY} por pipa, repartidos entre ${households} hogares.`}
+            name="feeMxn"
+            inputMode="numeric"
+            defaultValue={v.feeMxn ?? String(defaultFeePerHousehold(households))}
+            error={state.errors.feeMxn}
+          />
+          </>
+        )}
       </section>
 
       {/* Only informs: the "bomba prendida" checkbox in section 3 still decides the verdict */}

@@ -24,7 +24,9 @@ export type SummaryInput = {
   driverPresent: boolean;
   priceMxn: number; // what the driver asked
   paidMxn: number; // what the organizer actually paid him
-  feeMxn: number;
+  feeMxn: number; // per household
+  // The whole pipa's fee when it came from a collection ($10); overrides feeMxn × households
+  feeTotalMxn?: number | null;
   shareAmounts: number[];
   paidCount: number;
   challenges: { raisedBy: keyof typeof raisedByLabel; note: string }[];
@@ -57,7 +59,7 @@ export function buildSummary(s: SummaryInput): string {
   const households = s.shareAmounts.length;
   const low = Math.min(...s.shareAmounts);
   const high = Math.max(...s.shareAmounts);
-  const fee = s.feeMxn * households;
+  const fee = s.feeTotalMxn ?? s.feeMxn * households;
   const margin = `margen de medición de ${formatLitersWord(s.toleranceLiters)}`;
 
   const verdictLine =

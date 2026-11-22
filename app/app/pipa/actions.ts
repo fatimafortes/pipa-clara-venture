@@ -3,7 +3,9 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getCistern, getDelivery, requireUser } from "@/lib/data";
+import { isReady } from "@/lib/collection";
+import { getCistern, getCollection, getDelivery, requireUser, type CollectionDetail } from "@/lib/data";
+import { defaultFeePerHousehold } from "@/lib/pricing";
 import { logEvent } from "@/lib/events";
 import { isOwnPhotoPath } from "@/lib/photo";
 import { splitShares } from "@/lib/shares";
@@ -43,6 +45,20 @@ export async function createDelivery(
     pumpRan: field("pumpRan"),
     overflowed: field("overflowed"),
   };
+
+  // Registered from a collection: the price and fee come from it, never from the form
+  let collection: CollectionDetail | null = null;
+  const collectionId = field("collectionId");
+  if (collectionId) {
+    const found = await getCollection(collectionId);
+    if (!found || found.collection.cistern_id !== cistern.id) redirect("/app");
+    collection = found.collection;
+    if (collection.deliveryId) redirect(`/app/pipa/${collection.deliveryId}`);
+    if (!isReady(collection.shares)) redirect(`/app/colecta/${collection.id}`);
+    values.priceMxn = String(collection.price_mxn);
+    // Kept for older screens; fee_total_mxn below is the real fee for this pipa
+    values.feeMxn = String(defaultFeePerHousehold(cistern.households_count));
+  }
 
   const result = validateDelivery(
     { ...values, pumpRan: values.pumpRan === "on", overflowed: values.overflowed === "on" },
@@ -87,6 +103,8 @@ export async function createDelivery(
       overflowed: input.overflowed,
       measured_liters: verdict.measuredLiters,
       verdict: verdict.verdict,
+      collection_id: collection?.id ?? null,
+      fee_total_mxn: collection?.fee_mxn ?? null,
     })
     .select("id")
     .single();
@@ -98,6 +116,10 @@ export async function createDelivery(
       values,
     };
   };
+  // unique (collection_id): a second tap or a second tab can't register the same collection twice
+  if (deliveryError?.code === "23505" && collection) {
+    return { errors: { form: "Esta colecta ya tiene su pipa registrada." }, values };
+  }
   if (deliveryError) return failed("delivery", deliveryError);
 
   const readings = [
@@ -125,11 +147,20 @@ export async function createDelivery(
   ];
 
   const total = input.priceMxn + input.feeMxn * cistern.households_count;
-  const shares = splitShares(total, cistern.households_count).map((amount, i) => ({
-    delivery_id: delivery.id,
-    household_label: cistern.household_labels[i],
-    amount_mxn: amount,
-  }));
+  const shares = collection
+    ? // Already collected: same amounts, already paid, so nobody is asked twice
+      collection.shares.map((s) => ({
+        delivery_id: delivery.id,
+        household_label: s.household_label,
+        amount_mxn: s.amount_mxn,
+        paid: true,
+      }))
+    : splitShares(total, cistern.households_count).map((amount, i) => ({
+        delivery_id: delivery.id,
+        household_label: cistern.household_labels[i],
+        amount_mxn: amount,
+        paid: false,
+      }));
 
   const [readingsResult, sharesResult] = await Promise.all([
     supabase.from(TABLES.readings).insert(readings),
@@ -256,7 +287,8 @@ export async function setDriverPayment(
   if (error || !data) return failed("delivery", error);
 
   // Shares follow the money actually paid; who already paid stays as it was
-  const amounts = splitShares(paidMxn + delivery.fee_mxn * shares.length, shares.length);
+  const fee = delivery.fee_total_mxn ?? delivery.fee_mxn * shares.length;
+  const amounts = splitShares(paidMxn + fee, shares.length);
   const updates = await Promise.all(
     shares.map((share, i) =>
       supabase.from(TABLES.shares).update({ amount_mxn: amounts[i] }).eq("id", share.id).select("id").single(),

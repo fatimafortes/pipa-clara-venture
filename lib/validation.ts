@@ -1,3 +1,5 @@
+import { isDateOnly } from "./format";
+
 // Form validation (PACKET §11). Pure functions, so they run on the server and in tests.
 // Inputs are the raw strings from the form; messages are shown on screen, in Spanish.
 
@@ -184,4 +186,37 @@ export function validatePhoto(file: { type: string; size: number }): string | nu
     return "La foto pesa más de 5 MB. Toma otra o elige una más ligera.";
   }
   return null;
+}
+
+// "Nueva colecta" (F1): what the pipero asks, Pipa Clara's fee for the whole pipa,
+// and an optional date the group agreed. Whole pesos, inside the delivery ranges.
+export function validateCollection(input: { priceMxn: string; feeMxn: string; agreedDate: string }): Result<{
+  priceMxn: number;
+  feeMxn: number;
+  agreedDate: string | null;
+}> {
+  const errors: FieldErrors = {};
+  const priceMxn = checkRange(errors, "priceMxn", input.priceMxn, 1, 20000,
+    "El precio debe ser un número entero de pesos entre 1 y 20,000.", { wholeNumber: true });
+  const feeMxn = checkRange(errors, "feeMxn", input.feeMxn, 0, 500,
+    "La cuota debe ser un número entero de pesos entre 0 y 500.", { wholeNumber: true });
+  const date = input.agreedDate.trim();
+  if (date !== "" && !isDateOnly(date)) errors.agreedDate = "Elige una fecha válida, o déjala vacía.";
+  if (Object.keys(errors).length > 0) return { ok: false, errors };
+  return { ok: true, value: { priceMxn, feeMxn, agreedDate: date === "" ? null : date } };
+}
+
+// One household's share: received, promised for a date, or back to pending
+export function validateShareState(input: { state: string; promisedFor: string }): Result<{
+  state: "pending" | "promised" | "received";
+  promisedFor: string | null;
+}> {
+  const state = input.state;
+  if (state === "received" || state === "pending") return { ok: true, value: { state, promisedFor: null } };
+  if (state === "promised") {
+    const date = input.promisedFor.trim();
+    if (!isDateOnly(date)) return { ok: false, errors: { promisedFor: "Elige la fecha que prometió." } };
+    return { ok: true, value: { state, promisedFor: date } };
+  }
+  return { ok: false, errors: { state: "Elige un estado." } };
 }

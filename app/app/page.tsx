@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { getCistern, getDeliveries, requireUser } from "@/lib/data";
+import { receivedCount } from "@/lib/collection";
+import { getCistern, getCollections, getDeliveries, requireUser } from "@/lib/data";
 import { formatDay, formatLiters } from "@/lib/format";
 import { litersPerCm } from "@/lib/verdict";
 import { signOut } from "./actions";
@@ -30,17 +31,38 @@ const verdictLabel = {
 async function OrganizerHome() {
   const { user } = await requireUser();
   const [cistern, deliveries] = await Promise.all([getCistern(), getDeliveries()]);
+  const open = cistern ? (await getCollections(cistern)).find((c) => !c.deliveryId) : undefined;
 
   return (
     <div className="space-y-6">
       <LogAppOpened />
       {cistern && (
         <>
+          {/* Week 15: collect first, order after (the 100% rule) */}
+          {open ? (
+            <Link
+              href={`/app/colecta/${open.id}`}
+              className="block rounded-2xl border-2 border-teal bg-white p-5 text-lg"
+            >
+              <span className="block text-xl font-bold text-teal">Juntando para la pipa →</span>
+              <span className="block">
+                {receivedCount(open.shares)} de {open.shares.length} ya dieron su parte
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/app/colecta/nueva"
+              className="block rounded-xl bg-teal px-6 py-5 text-center text-xl font-semibold text-white hover:bg-teal-dark"
+            >
+              Nueva colecta
+              <span className="block text-base font-normal">Junten antes de pedir la pipa</span>
+            </Link>
+          )}
           <Link
             href="/app/pipa/nueva"
-            className="block rounded-xl bg-teal px-6 py-5 text-center text-xl font-semibold text-white hover:bg-teal-dark"
+            className="block rounded-xl border-2 border-teal bg-white px-6 py-4 text-center text-lg font-semibold text-teal"
           >
-            Nueva pipa
+            Nueva pipa sin colecta
           </Link>
 
           {deliveries.length > 0 && (

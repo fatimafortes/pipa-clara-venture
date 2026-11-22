@@ -7,6 +7,9 @@ export const TABLES = {
   shares: "pc_shares",
   challenges: "pc_challenges",
   events: "pc_events",
+  collections: "pc_collections",
+  collectionShares: "pc_collection_shares",
+  optins: "pc_optins",
 } as const;
 
 export const PHOTO_BUCKET = "pc_readings";

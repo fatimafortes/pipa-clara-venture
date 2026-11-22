@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  validateCollection,
+  validateShareState,
   parseNumber,
   validateChallenge,
   validateCistern,
@@ -165,5 +167,42 @@ describe("validatePhoto", () => {
   it("other formats → rejected", () => {
     expect(validatePhoto({ type: "image/gif", size: 1000 })).toContain("JPG o PNG");
     expect(validatePhoto({ type: "image/heic", size: 1000 })).toContain("JPG o PNG");
+  });
+});
+
+describe("validateCollection", () => {
+  it("accepts whole pesos and an optional date", () => {
+    expect(validateCollection({ priceMxn: "1500", feeMxn: "10", agreedDate: "" })).toEqual({
+      ok: true,
+      value: { priceMxn: 1500, feeMxn: 10, agreedDate: null },
+    });
+    expect(validateCollection({ priceMxn: "1500", feeMxn: "10", agreedDate: "2026-11-27" })).toMatchObject({
+      ok: true,
+      value: { agreedDate: "2026-11-27" },
+    });
+  });
+
+  it("rejects cents, out-of-range prices and impossible dates", () => {
+    const r = validateCollection({ priceMxn: "1500.50", feeMxn: "600", agreedDate: "2026-02-30" });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["agreedDate", "feeMxn", "priceMxn"]);
+    expect(validateCollection({ priceMxn: "0", feeMxn: "10", agreedDate: "" }).ok).toBe(false);
+    expect(validateCollection({ priceMxn: "20001", feeMxn: "10", agreedDate: "" }).ok).toBe(false);
+  });
+});
+
+describe("validateShareState", () => {
+  it("received and pending carry no date", () => {
+    expect(validateShareState({ state: "received", promisedFor: "2026-11-27" })).toEqual({
+      ok: true,
+      value: { state: "received", promisedFor: null },
+    });
+  });
+  it("a promise needs a real date", () => {
+    expect(validateShareState({ state: "promised", promisedFor: "" }).ok).toBe(false);
+    expect(validateShareState({ state: "promised", promisedFor: "2026-11-27" }).ok).toBe(true);
+  });
+  it("rejects unknown states", () => {
+    expect(validateShareState({ state: "paid", promisedFor: "" }).ok).toBe(false);
   });
 });

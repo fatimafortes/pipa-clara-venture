@@ -31,6 +31,10 @@ export type DeliveryRow = {
   verdict: Verdict;
   // What she actually paid the driver; null = the full price
   paid_mxn: number | null;
+  // Set when the pipa was registered from a collection ("Juntar antes de pedir")
+  collection_id: string | null;
+  // The whole pipa's fee when it came from a collection; null = fee_mxn × households
+  fee_total_mxn: number | null;
 };
 
 export type ReadingRow = {
@@ -56,6 +60,9 @@ export type ChallengeRow = {
   note: string;
   created_at: string;
 };
+
+const DELIVERY_COLUMNS =
+  "id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn, collection_id, fee_total_mxn";
 
 // Validates the session with Supabase; sends visitors without one to /login
 export async function requireUser() {
@@ -87,7 +94,7 @@ export async function getDeliveries(): Promise<(DeliveryRow & { paidCount: numbe
     supabase
       .from(TABLES.deliveries)
       .select(
-        `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn, ${TABLES.shares}(paid)`,
+        `id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn, collection_id, fee_total_mxn, ${TABLES.shares}(paid)`,
       )
       .order("delivered_at", { ascending: false }),
   );
@@ -113,7 +120,7 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
   const { data: delivery, error } = await retryOnFutureToken("getDelivery", () =>
     supabase
       .from(TABLES.deliveries)
-      .select("id, cistern_id, delivered_at, liters_claimed, price_mxn, fee_mxn, pump_ran, overflowed, measured_liters, verdict, paid_mxn")
+      .select(DELIVERY_COLUMNS)
       .eq("id", id)
       .maybeSingle(),
   );
@@ -170,4 +177,78 @@ export async function getDelivery(id: string): Promise<DeliveryDetail | null> {
     ),
     challenges: challenges.data,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Collections ("Juntar antes de pedir", F1). Status is derived, never stored.
+// ---------------------------------------------------------------------------
+
+export type CollectionShareRow = {
+  id: string;
+  household_label: string;
+  amount_mxn: number;
+  state: "pending" | "promised" | "received";
+  promised_for: string | null;
+};
+
+export type CollectionDetail = {
+  id: string;
+  cistern_id: string;
+  price_mxn: number;
+  fee_mxn: number;
+  agreed_date: string | null;
+  created_at: string;
+  shares: CollectionShareRow[];
+  // The delivery registered from it; null while collecting / ready
+  deliveryId: string | null;
+};
+
+const COLLECTION_COLUMNS = `id, cistern_id, price_mxn, fee_mxn, agreed_date, created_at, ${TABLES.collectionShares}(id, household_label, amount_mxn, state, promised_for), ${TABLES.deliveries}(id)`;
+
+type RawCollection = Omit<CollectionDetail, "shares" | "deliveryId"> & Record<string, unknown>;
+
+function toCollection(raw: RawCollection, labels: string[]): CollectionDetail {
+  const { [TABLES.collectionShares]: shares, [TABLES.deliveries]: deliveries, ...rest } = raw;
+  // One-to-one through the unique collection_id: PostgREST may return an object or a list
+  const linked = Array.isArray(deliveries) ? deliveries[0] : deliveries;
+  return {
+    ...(rest as Omit<CollectionDetail, "shares" | "deliveryId">),
+    // Same order as the organizer typed the households
+    shares: (shares as CollectionShareRow[]).toSorted(
+      (a, b) => labels.indexOf(a.household_label) - labels.indexOf(b.household_label),
+    ),
+    deliveryId: (linked as { id: string } | null | undefined)?.id ?? null,
+  };
+}
+
+// Her collections for this cistern, newest first
+export async function getCollections(cistern: CisternRow): Promise<CollectionDetail[]> {
+  const { supabase } = await requireUser();
+  const { data, error } = await retryOnFutureToken("getCollections", () =>
+    supabase
+      .from(TABLES.collections)
+      .select(COLLECTION_COLUMNS)
+      .eq("cistern_id", cistern.id)
+      .order("created_at", { ascending: false }),
+  );
+  if (error) throw error;
+  return (data as unknown as RawCollection[]).map((c) => toCollection(c, cistern.household_labels));
+}
+
+export async function getCollection(id: string): Promise<{ collection: CollectionDetail; cistern: CisternRow } | null> {
+  const { supabase } = await requireUser();
+  const { data, error } = await retryOnFutureToken("getCollection", () =>
+    supabase.from(TABLES.collections).select(COLLECTION_COLUMNS).eq("id", id).maybeSingle(),
+  );
+  if (error?.code === "22P02") return null;
+  if (error) throw error;
+  if (!data) return null;
+  const raw = data as unknown as RawCollection;
+  const { data: cistern, error: cisternError } = await supabase
+    .from(TABLES.cisterns)
+    .select("id, name, length_m, width_m, max_height_cm, households_count, household_labels")
+    .eq("id", raw.cistern_id)
+    .single();
+  if (cisternError) throw cisternError;
+  return { collection: toCollection(raw, cistern.household_labels), cistern };
 }

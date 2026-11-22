@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getDelivery, type DeliveryDetail } from "@/lib/data";
+import { differencePerHousehold } from "@/lib/collection";
+import { getCollection, getDelivery, type DeliveryDetail } from "@/lib/data";
 import { formatDay, formatLiters, formatMxn, formatNumber, formatTime } from "@/lib/format";
 import { buildSummary, whatsappLink } from "@/lib/summary";
 import { computeVerdict, insideMarginNote, precisionNote } from "@/lib/verdict";
@@ -75,10 +76,23 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
   const low = Math.min(...amounts);
   const high = Math.max(...amounts);
   const paid = shares.filter((s) => s.paid).length;
-  const fee = delivery.fee_mxn * shares.length;
+  // From a collection: the real $10 for the pipa; otherwise the per-household fee × households
+  const fee = delivery.fee_total_mxn ?? delivery.fee_mxn * shares.length;
   // What she actually paid the driver (persona test); null = the full price
   const paidToDriver = delivery.paid_mxn ?? delivery.price_mxn;
   const worth = measured === null ? null : valueOfMeasured(measured, delivery.liters_claimed, delivery.price_mxn);
+
+  // Collected before ordering and she paid the pipero less: what each household gave above
+  // its new share. Shown to her only; she decides to return it or keep it (no credit system).
+  const collected = delivery.collection_id ? (await getCollection(delivery.collection_id))?.collection : null;
+  const difference =
+    collected && paidToDriver < delivery.price_mxn
+      ? differencePerHousehold(
+          collected.shares.map((s) => ({ label: s.household_label, amountMxn: s.amount_mxn })),
+          shares.map((s) => ({ label: s.household_label, amountMxn: s.amount_mxn })),
+        )
+      : null;
+  const differenceTotal = difference?.reduce((sum, d) => sum + d.amountMxn, 0) ?? 0;
 
   // No household labels: the summary function doesn't even receive them
   const summary = buildSummary({
@@ -94,6 +108,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
     priceMxn: delivery.price_mxn,
     paidMxn: paidToDriver,
     feeMxn: delivery.fee_mxn,
+    feeTotalMxn: delivery.fee_total_mxn,
     shareAmounts: amounts,
     paidCount: paid,
     challenges: challenges.map((c) => ({ raisedBy: c.raised_by, note: c.note })),
@@ -187,10 +202,33 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
           {paidToDriver < delivery.price_mxn
             ? `Le pagaste al pipero ${formatMxn(paidToDriver)} de ${formatMxn(delivery.price_mxn)}. `
             : ""}
-          Pipa {formatMxn(paidToDriver)} + cuota de Pipa Clara {formatMxn(fee)} ({shares.length} ×{" "}
-          {formatMxn(delivery.fee_mxn)}) = {formatMxn(paidToDriver + fee)}, en partes iguales.
+          Pipa {formatMxn(paidToDriver)} + cuota de Pipa Clara {formatMxn(fee)}
+          {delivery.fee_total_mxn === null ? ` (${shares.length} × ${formatMxn(delivery.fee_mxn)})` : ""} ={" "}
+          {formatMxn(paidToDriver + fee)}, en partes iguales.
         </p>
+        {collected && (
+          <p className="text-base text-muted">Se juntó antes de pedir: las partes ya estaban cobradas.</p>
+        )}
       </section>
+
+      {difference && differenceTotal > 0 && (
+        <section className="space-y-3 rounded-2xl border-2 border-amber bg-amber-soft p-5">
+          <h2 className="text-xl font-bold">Te sobran {formatMxn(differenceTotal)} de lo que juntaron</h2>
+          <p className="text-lg">
+            Le pagaste al pipero menos de lo que juntaron. Esto dio cada hogar de más. Tú decides: devolverlo o
+            guardarlo para la próxima pipa.
+          </p>
+          <ul className="divide-y divide-amber/30">
+            {difference.map((d) => (
+              <li key={d.label} className="flex justify-between py-2 text-lg">
+                <span>{d.label}</span>
+                <span className="font-semibold">{formatMxn(d.amountMxn)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-base text-muted">Solo tú ves esta lista.</p>
+        </section>
+      )}
 
       {/* Right under "Cada hogar paga" (real sessions, W7): collecting is the organizer's next job */}
       <section id="pagos" className="scroll-mt-4 space-y-3">
