@@ -541,7 +541,7 @@ Session 2026-11-22. Packet first (`b60dde3`, `docs/PACKET.md`; Week 14 packet mo
 
 ## What couldn't be done (yet)
 
-- **`docs/mockup-week15.png` is missing.** It isn't in `~/Downloads` or anywhere on this Mac, and it isn't among the recent Canva designs. The packet links to it; add it as `docs: week 15 mockup`.
+- ~~`docs/mockup-week15.png` is missing~~ **Added** (`docs: week 15 mockup`). The first export from Canva was entirely white (all 1,591,296 pixels `255,255,255`), so it wasn't committed; the founder re-exported it and the second one matches Appendix A. Two small differences from the app, kept as is because the mockup follows Appendix A literally: it says "Cada hogar: $252" (the exact split is $252 ×4 and $251 ×2, which the app shows as "$251 o $252") and "faltan 1" (the app says "falta 1").
 - **Migration and RLS check not run in "semestre"** (no access from here). Until the founder runs them:
   - on the preview, collections fail for a signed-in user (tables missing);
   - the opt-in shows an error code after a valid submit.
@@ -555,4 +555,4 @@ Session 2026-11-22. Packet first (`b60dde3`, `docs/PACKET.md`; Week 14 packet mo
 
 1. Run `20261122120000_pc_week15.sql` in "semestre", then `w15-rls-test.sql` with both accounts (expect 19/19 PASA).
 2. Walk a real collection on the preview with the second account; then push `main`.
-3. Add the mockup; start A1's six-role walkthrough in `docs/content/A1/`.
+3. Start A1's six-role walkthrough in `docs/content/A1/`.
