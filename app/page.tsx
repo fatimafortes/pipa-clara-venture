@@ -22,16 +22,16 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href="/product"
+            href="/demo"
             className="rounded-xl bg-teal px-6 py-4 text-center text-lg font-semibold text-white hover:bg-teal-dark"
           >
-            Ver cómo funciona
+            Probar la demo, sin cuenta
           </Link>
           <Link
-            href="/about"
+            href="/product"
             className="rounded-xl border-2 border-teal bg-white px-6 py-4 text-center text-lg font-semibold text-teal"
           >
-            ¿Por qué Pipa Clara?
+            Ver cómo funciona
           </Link>
         </div>
       </section>
@@ -58,11 +58,11 @@ export default function HomePage() {
         <dl className="divide-y divide-line">
           <div className="flex items-baseline justify-between gap-4 py-3">
             <dt className="text-muted">Litros que dijo el pipero</dt>
-            <dd className="text-2xl font-bold">10,000 L</dd>
+            <dd className="whitespace-nowrap text-2xl font-bold">10,000 L</dd>
           </div>
           <div className="flex items-baseline justify-between gap-4 py-3">
             <dt className="text-muted">Litros que entraron (medidos)</dt>
-            <dd className="text-2xl font-bold">9,900 L</dd>
+            <dd className="whitespace-nowrap text-2xl font-bold">9,900 L</dd>
           </div>
         </dl>
         <div className="rounded-xl border-2 border-teal p-4">

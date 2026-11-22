@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
@@ -6,6 +7,14 @@ const buttonClass =
 
 // Header button: "Mi cisterna" with a session, "Entrar" without one
 export async function AuthButton() {
+  // /demo makes no Supabase call at all, not even to read the session (set by proxy.ts)
+  if ((await headers()).get("x-pc-demo") === "1") {
+    return (
+      <Link href="/login" className={buttonClass}>
+        Entrar
+      </Link>
+    );
+  }
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
 

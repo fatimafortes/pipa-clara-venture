@@ -5,6 +5,14 @@ import { NextResponse, type NextRequest } from "next/server";
 // can't write cookies, so this is the only safe place). On /app it also sends visitors
 // without a session to /login; that is a first filter only, /app checks again on the server.
 export async function proxy(request: NextRequest) {
+  // /demo never talks to Supabase (F4): no session refresh, and the header shows a plain
+  // "Entrar" (the x-pc-demo request header tells AuthButton to skip reading the session)
+  if (request.nextUrl.pathname === "/demo" || request.nextUrl.pathname.startsWith("/demo/")) {
+    const headers = new Headers(request.headers);
+    headers.set("x-pc-demo", "1");
+    return NextResponse.next({ request: { headers } });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

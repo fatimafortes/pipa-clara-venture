@@ -18,7 +18,7 @@ export function Header() {
           <AuthButton />
         </Suspense>
 
-        <nav className="flex w-full gap-6 text-base font-medium text-teal sm:w-auto sm:flex-1 sm:justify-end">
+        <nav className="flex w-full flex-wrap gap-x-4 gap-y-1 whitespace-nowrap text-base font-medium text-teal sm:w-auto sm:flex-1 sm:justify-end sm:gap-x-6">
           <Link href="/product" className="py-1 underline-offset-4 hover:underline">
             Cómo funciona
           </Link>
@@ -27,6 +27,9 @@ export function Header() {
           </Link>
           <Link href="/pricing" className="py-1 underline-offset-4 hover:underline">
             Precios
+          </Link>
+          <Link href="/demo" className="py-1 underline-offset-4 hover:underline">
+            Demo
           </Link>
         </nav>
       </div>

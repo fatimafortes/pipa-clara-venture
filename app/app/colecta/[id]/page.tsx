@@ -139,7 +139,7 @@ function ShareRow({ share, collectionId, locked }: { share: CollectionShareRow; 
   return (
     <li className="space-y-3 px-4 py-4">
       <p className="flex flex-wrap items-baseline justify-between gap-2 text-lg">
-        <span className="font-semibold">{share.household_label}</span>
+        <span className="shrink-0 font-semibold">{share.household_label}</span>
         <span className={received ? "font-semibold text-teal" : share.state === "promised" ? "text-amber" : "text-muted"}>
           {shareStateText(share.state, share.promised_for)}
         </span>
