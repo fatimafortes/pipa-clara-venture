@@ -572,3 +572,10 @@ Session 2026-11-22. Packet first (`b60dde3`, `docs/PACKET.md`; Week 14 packet mo
   1. The founder completes a Google sign-in and lands on `/app`.
   2. The first real collection end to end: open one, mark shares, "Listo para pedir" only at 100%, register the pipa, then try to register it twice (expect "Esta colecta ya tiene su pipa registrada").
   3. One real opt-in, to confirm the insert works, then delete that row in the table editor.
+
+## Week 15 — deviations from the packet (founder's)
+
+Changed the WhatsApp copy limit from 40 to 60 words during the A1 process: at 40 the two questions plus what the app does didn't fit clearly (A1 final = 53 words). Changed the opt-in test window from 72 h to 'until submission' because of the deadline; the real window will be reported.
+
+- Packet updated accordingly (`docs/PACKET.md` §4 role 2 and §5 test 2).
+- A1 screenshot stays **Pending** in `docs/content/approvals.md`: the founder takes it on her phone from production `/demo` before sending A1 to the encargada.

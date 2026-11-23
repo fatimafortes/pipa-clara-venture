@@ -67,7 +67,7 @@ Each role is a separate chat with only its input. The founder approves before an
 | # | Role | Input | Output | Quality check |
 |---|---|---|---|---|
 | 1 | Research | Concept + my evidence (A/C labels) | 3 findings, each with a source or a C label | Every finding traceable to a person or a page |
-| 2 | Writing | Findings + voice rules (3.3) | Copy (≤ 40 words for WhatsApp) | Sounds like a neighbor; understandable without me |
+| 2 | Writing | Findings + voice rules (3.3) | Copy (≤ 60 words for WhatsApp) | Sounds like a neighbor; understandable without me |
 | 3 | Visual | Copy + visual system (3.4) | Image or screen, via Canva | Uses the palette; no real faces, plates or names |
 | 4 | Claim check | Piece + claims register (3.2) | Pass / fail list | Nothing outside the register; nothing blames the pipero; nobody exposed |
 | 5 | Style review | Piece + 3.3 + 3.4 | Fixes | Consistent voice and look |
@@ -91,7 +91,7 @@ Each role is a separate chat with only its input. The founder approves before an
 **Three finished assets in three formats:** A1 (text), B1 (image), venture page with opt-in (web).
 **Two tests:**
 1. **A1 → the real encargada.** Ask: "¿Se lo mandarías a tu grupo? ¿Qué cambiarías?" Write down her exact words.
-2. **Venture page → 9 people from my sample** (5 buyers + 4 vecindad neighbors) via WhatsApp. Count opt-ins after 72 h. **Zero responses is valid evidence** and gets reported as zero.
+2. **Venture page → 9 people from my sample** (5 buyers + 4 vecindad neighbors) via WhatsApp. Count opt-ins at submission time; report the actual window. **Zero responses is valid evidence** and gets reported as zero.
 
 ## 6. Success definition
 
