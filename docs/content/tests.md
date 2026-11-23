@@ -22,6 +22,8 @@ Test 1 — A1 sent to the real encargada with the /demo screenshot.
 - The 100% rule as a hard block does not fit her: when water runs out she orders anyway if the gap is small. The simulated Rosa raised the same risk; now a real encargada confirms it.
 - New finding, not built: fairness of how the water is shared inside a shared cistern.
 
+**Compared with today's way (WhatsApp + cash):** She would forward A1 and use it alongside cash, not instead of it: neighbors keep paying her in cash. She did not say she prefers her current way, but the hard 100% block does not fit how she works today (she orders anyway when the gap is small). Not measured on time or errors yet.
+
 **What I change because of it:** A1 v2 ([`A1/final-v2.md`](A1/final-v2.md)), and "Pedir de todos modos" as Week 16 #1 (`docs/DECISIONS.md`).
 
 ## Test 2 · Venture page → 9 people from my sample

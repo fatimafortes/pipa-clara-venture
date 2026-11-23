@@ -3,7 +3,7 @@
 - **Format:** WhatsApp text
 - **Version / date:** final from Revision (role 6), 2026-11-22
 - **Approved by the founder:** ✅ see [`../approvals.md`](../approvals.md)
-- **Screenshot:** pending (see [`../approvals.md`](../approvals.md))
+- **Screenshot:** ✅ approved 2026-11-22 (see [`../approvals.md`](../approvals.md))
 
 ## Final piece
 
