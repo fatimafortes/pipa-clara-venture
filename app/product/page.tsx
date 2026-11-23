@@ -67,12 +67,12 @@ export default function ProductPage() {
         <h2 className="text-2xl font-bold">Los tres veredictos</h2>
         <ul className="space-y-3">
           <li className="rounded-xl border-2 border-teal bg-white p-4">
-            <strong className="text-teal">Consistente:</strong> entraron los litros que dijo el
-            pipero, dentro del margen de medición.
+            <strong className="text-teal">Llegó lo que dijo el pipero:</strong> entraron los litros
+            que dijo el pipero, dentro de lo que puede variar la medición con cinta.
           </li>
           <li className="rounded-xl border-2 border-amber bg-amber-soft p-4">
-            <strong className="text-amber">Faltante:</strong> entraron menos litros, más allá del
-            margen.
+            <strong className="text-amber">Entraron menos litros:</strong> la diferencia es mayor de lo
+            que puede variar la medición con cinta.
           </li>
           <li className="rounded-xl border-2 border-line bg-white p-4">
             <strong>No se pudo medir:</strong> faltó una lectura, la bomba estuvo prendida o la
@@ -104,8 +104,9 @@ export default function ProductPage() {
           10.
         </p>
         <p className="leading-relaxed">
-          <strong>Margen de medición</strong> = 2 cm por lectura, para arriba o para abajo. En una
-          cisterna de 2 × 2 m es un margen de 160 litros, menos del 2% de una pipa de 10,000 L.
+          <strong>Cuánto puede variar la medición con cinta</strong> = 2 cm por lectura, para arriba o
+          para abajo. En una cisterna de 2 × 2 m puede variar hasta 160 litros, menos del 2% de una pipa
+          de 10,000 L.
         </p>
         <p className="leading-relaxed">
           Sin inteligencia artificial: es aritmética que cualquiera puede revisar.

@@ -579,3 +579,19 @@ Changed the WhatsApp copy limit from 40 to 60 words during the A1 process: at 40
 
 - Packet updated accordingly (`docs/PACKET.md` §4 role 2 and §5 test 2).
 - A1 screenshot stays **Pending** in `docs/content/approvals.md`: the founder takes it on her phone from production `/demo` before sending A1 to the encargada.
+
+## Week 15 — persona test (SIMULATED) and plain-language fix
+
+- **Persona pass:** Rosa (`docs/PERSONAS.md`) walked the 5 `/demo` screens from desktop screenshots, in a separate chat. **It is a simulation, not a real user.** The full log is in `docs/content/persona-rosa-w15.md`.
+- **Worst confusion (simulated):** "Listo para pedir" blocked when water is urgent; Rosa would order anyway and cover the missing share. **NOT changed this week:** it comes from a simulation, and my only real encargada co-designed the 100% rule. It is now the #1 risk to test with the real encargada when I send A1: "¿Qué haces si se acaba el agua y falta una casa?"
+- **Also not fixed (logged):** measuring in front of the pipero feels socially risky to Rosa (she'd quit there); long summary; wants neighbor names instead of "Casa N" (labels are already editable).
+- **Fixed: the language list** (founder's decision: language only, no logic or database change):
+  - "Consistente" → "Llegó lo que dijo el pipero"; "Faltante" → "Entraron menos litros"; "No se pudo medir" stays. Applied on screens (`/app` list, delivery page, `/demo`, home example, `/product`) and in the WhatsApp summary. The three names now live in one place, `VERDICT_LABEL` in `lib/verdict.ts`.
+  - "margen de medición de X litros" → "la medición con cinta puede variar hasta X litros" (`varianceText()` in `lib/verdict.ts`, used by the verdict reasons, the "unos X L menos" note and the summary).
+  - "Fecha que acordó el grupo" → "Fecha límite para pagar (la decide el grupo)" (collection form, collection screen, `/demo`, progress message).
+  - Next to "$251 o $252": "Para que sume exacto, a algunas casas les toca $1 más." (collection screen, `/demo`, delivery page, home example, WhatsApp summary), shown only when the shares differ.
+  - "Hoy no cobramos la cuota en el piloto" → "Por ahora no cobramos la cuota de $10. Si ya la juntaste, déjala para la siguiente pipa." (`/demo`, new-collection form).
+  - WhatsApp summary: no "sin foto" when there is no photo; "con foto guardada" when there is.
+  - Progress message starts with "Vecinos:" instead of "Pipa Clara ·". Written as "Vecinos: juntando para la pipa, 5 de 6 ya dieron su parte.", with a comma instead of a second colon.
+- **Tests updated** to the new texts, plus 2 new ones (no "sin foto"; the $1 note only when shares differ): 123 passing.
+- **Not changed, outside "app and /demo":** `/pricing` still says "margen de medición" (the simulator and the "Lo que siempre incluye" list) and "En el piloto todavía no está activo". The simulator field "Faltante esperado por pipa" is a business parameter, not a verdict.

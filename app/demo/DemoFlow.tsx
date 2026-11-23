@@ -6,8 +6,9 @@ import { CollectionProgress, NEVER_HOLDS_MONEY, NotReadyButton, shareStateText }
 import { ExampleBadge } from "@/components/ExampleBadge";
 import { isReady, type CollectionShare } from "@/lib/collection";
 import { DEMO, demoStartShares, demoSummary, demoVerdict } from "@/lib/demo";
-import { formatLiters, formatMxn, formatTime } from "@/lib/format";
+import { formatLiters, formatLitersWord, formatMxn, formatTime } from "@/lib/format";
 import { buildProgressMessage } from "@/lib/progress";
+import { VERDICT_LABEL } from "@/lib/verdict";
 
 const STEPS = ["Juntar", "Pedir", "Medir", "Veredicto", "Resumen"] as const;
 
@@ -116,7 +117,7 @@ export function DemoFlow() {
               Tienes {formatMxn(DEMO.priceMxn + DEMO.feeMxn)}: {formatMxn(DEMO.priceMxn)} para el pipero y{" "}
               {formatMxn(DEMO.feeMxn)} de Pipa Clara. Ahora sí, pide la pipa. Nadie puso de su bolsa.
             </p>
-            <p className="text-base text-muted">Hoy no cobramos la cuota en el piloto.</p>
+            <p className="text-base text-muted">Por ahora no cobramos la cuota de $10. Si ya la juntaste, déjala para la siguiente pipa.</p>
           </section>
           <button type="button" onClick={() => go(2)} className={primary}>
             Llegó la pipa: medir
@@ -178,11 +179,11 @@ export function DemoFlow() {
           </dl>
           <section className="space-y-2 rounded-2xl border-2 border-teal bg-white p-5">
             <p className="text-sm font-bold tracking-widest text-teal">VEREDICTO</p>
-            <p className="text-3xl font-bold text-teal">Consistente</p>
+            <p className="text-3xl font-bold text-teal">{VERDICT_LABEL.consistent}</p>
             <p className="text-lg leading-relaxed">{note ?? result.reason}</p>
             <p className="text-base text-muted">
-              Margen: 2 cm por lectura ({formatLiters(result.toleranceLiters)} en esta cisterna). Aún no verificado
-              en cisternas reales.
+              La medición con cinta puede variar hasta {formatLitersWord(result.toleranceLiters)} en esta cisterna (2 cm
+              por lectura). Aún no verificado en cisternas reales.
             </p>
           </section>
           <p className="text-base text-muted">

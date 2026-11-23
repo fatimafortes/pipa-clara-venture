@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { receivedCount } from "@/lib/collection";
 import { getCistern, getCollections, getDeliveries, requireUser } from "@/lib/data";
 import { formatDay, formatLiters } from "@/lib/format";
-import { litersPerCm } from "@/lib/verdict";
+import { VERDICT_LABEL, litersPerCm } from "@/lib/verdict";
 import { signOut } from "./actions";
 import { CisternForm } from "./CisternForm";
 import { LogAppOpened } from "./pipa/[id]/EventLoggers";
@@ -22,11 +22,7 @@ export default function AppPage() {
   );
 }
 
-const verdictLabel = {
-  consistent: "Consistente",
-  short: "Faltante",
-  couldnt_measure: "No se pudo medir",
-} as const;
+const verdictLabel = VERDICT_LABEL;
 
 async function OrganizerHome() {
   const { user } = await requireUser();

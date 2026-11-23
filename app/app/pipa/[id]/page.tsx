@@ -6,7 +6,8 @@ import { differencePerHousehold } from "@/lib/collection";
 import { getCollection, getDelivery, type DeliveryDetail } from "@/lib/data";
 import { formatDay, formatLiters, formatMxn, formatNumber, formatTime } from "@/lib/format";
 import { buildSummary, whatsappLink } from "@/lib/summary";
-import { computeVerdict, insideMarginNote, precisionNote } from "@/lib/verdict";
+import { VERDICT_LABEL, computeVerdict, insideMarginNote, precisionNote } from "@/lib/verdict";
+import { UNEVEN_SHARES_NOTE } from "@/lib/summary";
 import { setSharePaid } from "../actions";
 import { valueOfMeasured } from "@/lib/shares";
 import { ChallengeForm } from "./ChallengeForm";
@@ -63,10 +64,8 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
   const measured = delivery.measured_liters;
   const title =
     delivery.verdict === "short" && measured !== null
-      ? `Faltante: ${formatLiters(delivery.liters_claimed - measured)}`
-      : delivery.verdict === "consistent"
-        ? "Consistente"
-        : "No se pudo medir";
+      ? `${VERDICT_LABEL.short}: ${formatLiters(delivery.liters_claimed - measured)} menos`
+      : VERDICT_LABEL[delivery.verdict];
   const style = cardStyle[delivery.verdict];
   // Below the claim but inside the margin: say so instead of "entraron los litros que dijo"
   const insideNote = delivery.verdict === "consistent" ? insideMarginNote(explained, delivery.liters_claimed) : null;
@@ -190,6 +189,7 @@ async function DeliveryVerdict({ id, paymentError }: { id: string; paymentError:
             <span className="text-3xl font-bold">
               {low === high ? formatMxn(low) : `${formatMxn(low)} o ${formatMxn(high)}`}
             </span>
+            {low !== high && <span className="block text-base text-muted">{UNEVEN_SHARES_NOTE}</span>}
           </p>
           <a
             href="#pagos"

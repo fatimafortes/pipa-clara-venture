@@ -33,15 +33,15 @@ export function CollectionForm({ households }: { households: number }) {
         />
         <Field
           label="Cuota de Pipa Clara por pipa ($)"
-          hint={`$${FAMILY_FEE_PER_DELIVERY} por pipa en total, repartidos entre los ${households} hogares. Hoy no cobramos en el piloto.`}
+          hint={`$${FAMILY_FEE_PER_DELIVERY} por pipa en total, repartidos entre los ${households} hogares. Por ahora no cobramos la cuota de $10. Si ya la juntaste, déjala para la siguiente pipa.`}
           name="feeMxn"
           inputMode="numeric"
           defaultValue={v.feeMxn ?? String(FAMILY_FEE_PER_DELIVERY)}
           error={state.errors.feeMxn}
         />
         <Field
-          label="Fecha que acordó el grupo (opcional)"
-          hint="La fecha la decide el grupo, no la app."
+          label="Fecha límite para pagar (la decide el grupo)"
+          hint="Opcional."
           name="agreedDate"
           type="date"
           defaultValue={v.agreedDate}

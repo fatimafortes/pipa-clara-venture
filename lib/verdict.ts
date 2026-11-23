@@ -4,6 +4,19 @@ import { formatLiters, formatLitersWord } from "./format";
 
 export type Verdict = "consistent" | "short" | "couldnt_measure";
 
+// What each verdict is called on screen and in the WhatsApp summary (Week 15 persona
+// test: "consistente" and "faltante" read like an audit). One place for every screen.
+export const VERDICT_LABEL: Record<Verdict, string> = {
+  consistent: "Llegó lo que dijo el pipero",
+  short: "Entraron menos litros",
+  couldnt_measure: "No se pudo medir",
+};
+
+// "la medición con cinta puede variar hasta 300 litros" (was "margen de medición de 300 litros")
+export function varianceText(toleranceLiters: number): string {
+  return `la medición con cinta puede variar hasta ${formatLitersWord(toleranceLiters)}`;
+}
+
 export type VerdictInput = {
   lengthM: number;
   widthM: number;
@@ -95,7 +108,7 @@ export function computeVerdict(input: VerdictInput): VerdictResult {
       ...measured,
       belowClaimInsideMargin: measuredLiters < input.litersClaimed,
       verdict: "consistent",
-      reason: `Entraron los litros que dijo el pipero, dentro del margen de medición de ${formatLitersWord(toleranceLiters)}.`,
+      reason: `Entraron los litros que dijo el pipero. La ${varianceText(toleranceLiters).slice(3)}.`,
     };
   }
 
@@ -103,17 +116,17 @@ export function computeVerdict(input: VerdictInput): VerdictResult {
     ...measured,
     belowClaimInsideMargin: false,
     verdict: "short",
-    reason: `Entraron menos litros de los que dijo el pipero, más allá del margen de medición de ${formatLitersWord(toleranceLiters)}.`,
+    reason: `Entraron menos litros de los que dijo el pipero. La ${varianceText(toleranceLiters).slice(3)}, y la diferencia es mayor.`,
   };
 }
 
-// "Entraron unos 100 L menos de lo que dijo el pipero, dentro del margen de medición de 150 litros."
+// "Entraron unos 100 L menos de lo que dijo el pipero, pero la medición con cinta puede variar hasta 150 litros."
 // Only for a consistent delivery below the claim; null when the difference rounds to under 10 L.
 export function insideMarginNote(result: VerdictResult, litersClaimed: number): string | null {
   if (!result.belowClaimInsideMargin || result.measuredLiters === null) return null;
   const less = Math.round((litersClaimed - result.measuredLiters) / 10) * 10;
   if (less < 10) return null;
-  return `Entraron unos ${formatLiters(less)} menos de lo que dijo el pipero, dentro del margen de medición de ${formatLitersWord(result.toleranceLiters)}.`;
+  return `Entraron unos ${formatLiters(less)} menos de lo que dijo el pipero, pero ${varianceText(result.toleranceLiters)}.`;
 }
 
 // The grey box under the verdict: how precise this measurement was

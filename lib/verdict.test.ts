@@ -99,7 +99,7 @@ describe("computeVerdict", () => {
     expect(result.toleranceLiters).toBe(300);
     expect(result.verdict).toBe("short");
     expect(result.reason).toBe(
-      "Entraron menos litros de los que dijo el pipero, más allá del margen de medición de 300 litros.",
+      "Entraron menos litros de los que dijo el pipero. La medición con cinta puede variar hasta 300 litros, y la diferencia es mayor.",
     );
   });
 
@@ -166,7 +166,7 @@ describe("computeVerdict with a repeated 'before' reading", () => {
     expect(result.belowClaimInsideMargin).toBe(true);
     expect(result.measuredRange).toEqual({ low: 9_750, high: 10_050 });
     expect(insideMarginNote(result, 10_000)).toBe(
-      "Entraron unos 100 L menos de lo que dijo el pipero, dentro del margen de medición de 150 litros.",
+      "Entraron unos 100 L menos de lo que dijo el pipero, pero la medición con cinta puede variar hasta 150 litros.",
     );
   });
 

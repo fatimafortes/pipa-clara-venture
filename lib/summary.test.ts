@@ -26,21 +26,37 @@ describe("buildSummary", () => {
     expect(text).toContain("Pipa del 25 de octubre");
     expect(text).toContain("Litros que dijo el pipero: 10,000 L");
     expect(text).toContain("Litros que entraron (medidos): 8,700 L");
-    expect(text).toContain("FALTANTE de 1,300 L");
+    expect(text).toContain("Veredicto: Entraron menos litros, 1,300 L menos");
     expect(text).toContain("Cada hogar paga: $152");
     expect(text).toContain("Ya pagaron: 7 de 12");
   });
 
   it("says the margin in words, not '±300 L' (persona test)", () => {
     const text = buildSummary(mockup);
-    expect(text).toContain("margen de medición de 300 litros");
+    expect(text).toContain("la medición con cinta puede variar hasta 300 litros");
     expect(text).not.toContain("±");
+    expect(text).not.toContain("margen");
   });
 
   it("shows the time of BOTH readings, in Mexico City time (persona test)", () => {
     const text = buildSummary(mockup);
     expect(text).toContain("Lectura de antes: 08:02, con el pipero presente, con foto guardada");
     expect(text).toContain("Lectura de después: 08:41, con foto guardada");
+  });
+
+  it("without a photo says nothing about it, never 'sin foto' (Week 15 persona test)", () => {
+    const noPhoto = { takenAt: "2026-10-25T14:02:00Z", hasPhoto: false };
+    const text = buildSummary({ ...mockup, before: noPhoto, after: { ...noPhoto, takenAt: "2026-10-25T14:41:00Z" } });
+    expect(text).not.toContain("sin foto");
+    expect(text).toContain("Lectura de antes: 08:02, con el pipero presente");
+    expect(text).toContain("Lectura de después: 08:41");
+  });
+
+  it("explains the extra $1 only when shares differ (Week 15 persona test)", () => {
+    expect(buildSummary(mockup)).not.toContain("$1 más");
+    const uneven = buildSummary({ ...mockup, shareAmounts: [252, 252, 252, 252, 251, 251] });
+    expect(uneven).toContain("Cada hogar paga: $251 o $252");
+    expect(uneven).toContain("Para que sume exacto, a algunas casas les toca $1 más.");
   });
 
   it("short but full price paid: says so, so the verdict isn't silently ignored", () => {
@@ -87,7 +103,7 @@ describe("buildSummary", () => {
     const text = buildSummary({ ...mockup, verdict: "couldnt_measure", measuredLiters: null, after: null });
     expect(text).toContain("Litros que entraron (medidos): no se pudo medir");
     expect(text).toContain("NO SE PUDO MEDIR");
-    expect(text).not.toContain("FALTANTE");
+    expect(text).not.toContain("Entraron menos litros");
     expect(text).not.toContain("Lectura de después");
   });
 });
@@ -108,9 +124,9 @@ const week13: SummaryInput = {
 describe("buildSummary with the Week 13 precision check", () => {
   it("consistent below the claim: the margin from the repeat (150 L) and the 'unos X L menos' sentence", () => {
     const text = buildSummary(week13);
-    expect(text).toContain("Veredicto: CONSISTENTE (margen de medición de 150 litros)");
+    expect(text).toContain("Veredicto: Llegó lo que dijo el pipero (la medición con cinta puede variar hasta 150 litros)");
     expect(text).toContain(
-      "Entraron unos 100 L menos de lo que dijo el pipero, dentro del margen de medición de 150 litros.",
+      "Entraron unos 100 L menos de lo que dijo el pipero, pero la medición con cinta puede variar hasta 150 litros.",
     );
   });
 
@@ -121,7 +137,7 @@ describe("buildSummary with the Week 13 precision check", () => {
 
   it("the sentence never appears on a short or couldn't-measure verdict, even if passed", () => {
     for (const verdict of ["short", "couldnt_measure"] as const) {
-      expect(buildSummary({ ...week13, verdict })).not.toContain("dentro del margen de medición de 150 litros.");
+      expect(buildSummary({ ...week13, verdict })).not.toContain("pero la medición con cinta puede variar hasta 150 litros.");
     }
   });
 

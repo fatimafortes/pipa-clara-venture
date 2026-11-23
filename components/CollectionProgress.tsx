@@ -1,5 +1,7 @@
 import { readyButtonLabel, receivedCount, type ShareState } from "@/lib/collection";
 import { formatDateOnly, formatMxn } from "@/lib/format";
+import { AGREED_DATE_LABEL } from "@/lib/progress";
+import { UNEVEN_SHARES_NOTE } from "@/lib/summary";
 
 // The top of a collection (mockup Week 15): the pipa, each household's share,
 // "5 de 6 ya dieron su parte" and the date the group agreed.
@@ -30,6 +32,7 @@ export function CollectionProgress({
         <span className="block text-2xl font-bold">
           Cada hogar: {low === high ? formatMxn(low) : `${formatMxn(low)} o ${formatMxn(high)}`}
         </span>
+        {low !== high && <span className="block text-base text-muted">{UNEVEN_SHARES_NOTE}</span>}
       </p>
       <div>
         <div
@@ -48,7 +51,7 @@ export function CollectionProgress({
       </div>
       {agreedDate && (
         <p className="rounded-xl bg-teal-soft px-4 py-3 text-lg text-teal">
-          Fecha que acordó el grupo: {formatDateOnly(agreedDate)}
+          {AGREED_DATE_LABEL}: {formatDateOnly(agreedDate)}
         </p>
       )}
     </section>

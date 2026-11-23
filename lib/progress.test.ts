@@ -9,7 +9,7 @@ const shares = collectionShares(1_500, 10, labels).map((s, i) => ({ ...s, state:
 describe("buildProgressMessage", () => {
   it("matches the packet's message", () => {
     expect(buildProgressMessage({ shares, agreedDate: "2026-11-27" })).toBe(
-      "Pipa Clara · Juntando para la pipa: 5 de 6 ya dieron su parte. Fecha que acordó el grupo: viernes, 27 de noviembre. Cuando estemos todos, se pide.",
+      "Vecinos: juntando para la pipa, 5 de 6 ya dieron su parte. Fecha límite para pagar (la decide el grupo): viernes, 27 de noviembre. Cuando estemos todos, se pide.",
     );
   });
 
@@ -22,7 +22,7 @@ describe("buildProgressMessage", () => {
 
   it("the agreed date is optional", () => {
     expect(buildProgressMessage({ shares })).toBe(
-      "Pipa Clara · Juntando para la pipa: 5 de 6 ya dieron su parte. Cuando estemos todos, se pide.",
+      "Vecinos: juntando para la pipa, 5 de 6 ya dieron su parte. Cuando estemos todos, se pide.",
     );
   });
 

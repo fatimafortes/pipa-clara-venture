@@ -1,6 +1,6 @@
-import { formatDay, formatLiters, formatLitersWord, formatMxn, formatTime } from "./format";
+import { formatDay, formatLiters, formatMxn, formatTime } from "./format";
 import { valueOfMeasured } from "./shares";
-import type { Verdict } from "./verdict";
+import { VERDICT_LABEL, varianceText, type Verdict } from "./verdict";
 
 // The WhatsApp summary for the neighbors (CHARTER principle 3): what entered,
 // what was paid and why, what each household owes and how many have paid.
@@ -34,7 +34,7 @@ export type SummaryInput = {
 
 function readingLine(label: string, reading: SummaryReading, extra?: string): string | null {
   if (!reading) return null;
-  const parts = [formatTime(reading.takenAt), extra, reading.hasPhoto ? "con foto guardada" : "sin foto"];
+  const parts = [formatTime(reading.takenAt), extra, reading.hasPhoto ? "con foto guardada" : null];
   return `Lectura de ${label}: ${parts.filter(Boolean).join(", ")}`;
 }
 
@@ -60,13 +60,13 @@ export function buildSummary(s: SummaryInput): string {
   const low = Math.min(...s.shareAmounts);
   const high = Math.max(...s.shareAmounts);
   const fee = s.feeTotalMxn ?? s.feeMxn * households;
-  const margin = `margen de medición de ${formatLitersWord(s.toleranceLiters)}`;
+  const margin = varianceText(s.toleranceLiters);
 
   const verdictLine =
     s.verdict === "short" && s.measuredLiters !== null
-      ? `Veredicto: FALTANTE de ${formatLiters(s.litersClaimed - s.measuredLiters)} (${margin})`
+      ? `Veredicto: ${VERDICT_LABEL.short}, ${formatLiters(s.litersClaimed - s.measuredLiters)} menos (${margin})`
       : s.verdict === "consistent"
-        ? `Veredicto: CONSISTENTE (${margin})`
+        ? `Veredicto: ${VERDICT_LABEL.consistent} (${margin})`
         : "Veredicto: NO SE PUDO MEDIR";
 
   const lines: (string | null)[] = [
@@ -83,6 +83,7 @@ export function buildSummary(s: SummaryInput): string {
     "",
     paymentLine(s),
     `Cada hogar paga: ${low === high ? formatMxn(low) : `${formatMxn(low)} o ${formatMxn(high)}`}`,
+    low === high ? null : UNEVEN_SHARES_NOTE,
     `(pipa ${formatMxn(s.paidMxn)} + cuota de Pipa Clara ${formatMxn(fee)}, en partes iguales)`,
     `Ya pagaron: ${s.paidCount} de ${households}`,
   ];
@@ -96,6 +97,9 @@ export function buildSummary(s: SummaryInput): string {
 
   return lines.filter((line) => line !== null).join("\n");
 }
+
+// Next to "$251 o $252" everywhere (Week 15 persona test)
+export const UNEVEN_SHARES_NOTE = "Para que sume exacto, a algunas casas les toca $1 más.";
 
 export function whatsappLink(text: string): string {
   return `https://wa.me/?text=${encodeURIComponent(text)}`;

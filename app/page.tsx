@@ -5,7 +5,7 @@ import { OptInForm } from "@/components/OptInForm";
 // Week 15: the homepage speaks to the encargada (PACKET §3.1, F3). The example shows
 // payment BEFORE delivery: 6 de 6 pagaron → se pidió → se midió.
 const exampleSteps = [
-  { n: 1, title: "6 de 6 pagaron", body: "$1,500 del pipero + $10 de Pipa Clara. Cada hogar: $251 o $252." },
+  { n: 1, title: "6 de 6 pagaron", body: "$1,500 del pipero + $10 de Pipa Clara. Cada hogar: $251 o $252. Para que sume exacto, a algunas casas les toca $1 más." },
   { n: 2, title: "Se pidió", body: "Con todo el dinero junto. Nadie puso de su bolsa." },
   { n: 3, title: "Se midió", body: "Frente al pipero, antes y después de descargar." },
 ];
@@ -68,10 +68,10 @@ export default function HomePage() {
         </dl>
         <div className="rounded-xl border-2 border-teal p-4">
           <p className="text-sm font-bold tracking-widest text-teal">VEREDICTO</p>
-          <p className="text-3xl font-bold text-teal">Consistente</p>
+          <p className="text-3xl font-bold text-teal">Llegó lo que dijo el pipero</p>
           <p className="mt-1">
-            Entraron unos 100 litros menos, dentro del margen de medición: 2 cm por lectura (300 L en esta
-            cisterna de 3 × 2.5 m). Ese margen aún no está verificado en cisternas reales.
+            Entraron unos 100 litros menos, pero la medición con cinta puede variar hasta 300 litros en esta
+            cisterna de 3 × 2.5 m (2 cm por lectura). Eso aún no está verificado en cisternas reales.
           </p>
         </div>
         <span className="inline-block rounded-full bg-teal-soft px-4 py-2 font-semibold text-teal">
