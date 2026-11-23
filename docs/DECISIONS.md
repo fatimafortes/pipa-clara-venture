@@ -595,3 +595,8 @@ Changed the WhatsApp copy limit from 40 to 60 words during the A1 process: at 40
   - Progress message starts with "Vecinos:" instead of "Pipa Clara ·". Written as "Vecinos: juntando para la pipa, 5 de 6 ya dieron su parte.", with a comma instead of a second colon.
 - **Tests updated** to the new texts, plus 2 new ones (no "sin foto"; the $1 note only when shares differ): 123 passing.
 - **Not changed, outside "app and /demo":** `/pricing` still says "margen de medición" (the simulator and the "Lo que siempre incluye" list) and "En el piloto todavía no está activo". The simulator field "Faltante esperado por pipa" is a business parameter, not a verdict.
+
+## Week 15 — real encargada test (2026-11-22)
+
+- A1 sent to the real encargada with the /demo screenshot; her exact words are in `docs/content/tests.md` (Test 1). A1 v2 is in `docs/content/A1/final-v2.md`, approved in `docs/content/approvals.md`.
+- **Week 16 #1: 'Pedir de todos modos'** — let the organizer order before 100% and record how much she covered and who owes her. Evidence: real encargada (A, n=1) + simulated Rosa. Not built in week 15 due to the deadline; the 100% rule stays as an option, not the only path.
