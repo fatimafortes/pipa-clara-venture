@@ -568,10 +568,10 @@ Session 2026-11-22. Packet first (`b60dde3`, `docs/PACKET.md`; Week 14 packet mo
   - `/demo` walked at 375 px through all five steps: no horizontal scroll, **0 requests to Supabase**, no page errors.
   - **Login, up to Google:** "Entrar con Google" → Supabase `/auth/v1/authorize` with `redirect_to=https://www.pipa-clara.site/auth/callback` → Google's sign-in page. Not completed: that needs the founder's Google account.
   - Observation: on a fresh browser, Google's email page says "to continue to `<project>.supabase.co`", not "Pipa Clara". No auth code changed this week. Week 13 recorded "Pipa Clara" on that screen, possibly on another step (account chooser or consent). To confirm on the founder's phone.
-- **Still pending, on production:**
-  1. The founder completes a Google sign-in and lands on `/app`.
-  2. The first real collection end to end: open one, mark shares, "Listo para pedir" only at 100%, register the pipa, then try to register it twice (expect "Esta colecta ya tiene su pipa registrada").
-  3. One real opt-in, to confirm the insert works, then delete that row in the table editor.
+- **Pending on production — all done by the founder on 2026-11-22:**
+  1. ~~The founder completes a Google sign-in and lands on `/app`.~~ **Done.**
+  2. ~~The first real collection end to end: open one, mark shares, "Listo para pedir" only at 100%, register the pipa, then try to register it twice (expect "Esta colecta ya tiene su pipa registrada").~~ **Done:** a full collection; the app refused to register the pipa a second time.
+  3. ~~One real opt-in, to confirm the insert works, then delete that row in the table editor.~~ **Done:** test opt-in sent, then deleted.
 
 ## Week 15 — deviations from the packet (founder's)
 
