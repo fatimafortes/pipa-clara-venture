@@ -32,19 +32,9 @@ Venture page with opt-in shared by WhatsApp with 9 people (5 school-sample buyer
 
 - **Sent on (date and time):** 2026-11-22, 15:14
 - **Read after 72 h on (date and time):** 2026-11-22, 23:25 (about 8 h, not 72 h)
-- **Message sent (exactly):**
+- **Message sent (exactly):** "Hola, estoy probando Pipa Clara, una página para quien organiza la pipa del edificio o la vecindad. ¿La puedes ver? Si te interesa, deja tu contacto en 'Avísame': www.pipa-clara.site"
 
-| # | Group (buyer / vecindad neighbor) | Sent | Opened the page? (if known) | Opted in? | Comment (exact words, if any) |
-|---|---|---|---|---|---|
-| 1 | buyer |  |  |  |  |
-| 2 | buyer |  |  |  |  |
-| 3 | buyer |  |  |  |  |
-| 4 | buyer |  |  |  |  |
-| 5 | buyer |  |  |  |  |
-| 6 | vecindad neighbor |  |  |  |  |
-| 7 | vecindad neighbor |  |  |  |  |
-| 8 | vecindad neighbor |  |  |  |  |
-| 9 | vecindad neighbor |  |  |  |  |
+Not recorded per person; only the total opt-ins in pc_optins (4 of 9). No names or contacts are stored here.
 
 - **Opt-ins counted in `pc_optins` after 72 h:** 4 (at 23:25, about 8 h) <!-- count in the Supabase table editor; friends' opt-ins don't count as validation (Blueprint condition 6) -->
 - **Total: 4 of 9**
