@@ -28,8 +28,10 @@ Test 1 — A1 sent to the real encargada with the /demo screenshot.
 
 ## Test 2 · Venture page → 9 people from my sample
 
-- **Sent on (date and time):**
-- **Read after 72 h on (date and time):**
+Venture page with opt-in shared by WhatsApp with 9 people (5 school-sample buyers + 4 vecindad neighbors) on 2026-11-22 at 15:14. Result at 23:25 the same day: 4 opt-ins in pc_optins (4 of 9). Window: about 8 hours, shorter than the 72 h first planned. Friends and acquaintances, so opt-ins show interest, not validation (Blueprint C6).
+
+- **Sent on (date and time):** 2026-11-22, 15:14
+- **Read after 72 h on (date and time):** 2026-11-22, 23:25 (about 8 h, not 72 h)
 - **Message sent (exactly):**
 
 | # | Group (buyer / vecindad neighbor) | Sent | Opened the page? (if known) | Opted in? | Comment (exact words, if any) |
@@ -44,8 +46,8 @@ Test 1 — A1 sent to the real encargada with the /demo screenshot.
 | 8 | vecindad neighbor |  |  |  |  |
 | 9 | vecindad neighbor |  |  |  |  |
 
-- **Opt-ins counted in `pc_optins` after 72 h:** <!-- count in the Supabase table editor; friends' opt-ins don't count as validation (Blueprint condition 6) -->
-- **Total: __ of 9**
+- **Opt-ins counted in `pc_optins` after 72 h:** 4 (at 23:25, about 8 h) <!-- count in the Supabase table editor; friends' opt-ins don't count as validation (Blueprint condition 6) -->
+- **Total: 4 of 9**
 
 ## Persona pass (separate chat, from phone screenshots)
 
